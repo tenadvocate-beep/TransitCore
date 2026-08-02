@@ -1,0 +1,279 @@
+/* ===========================
+   GLOBAL THEME
+=========================== */
+
+*{
+    transition:
+        background .35s,
+        color .35s,
+        border-color .35s,
+        box-shadow .35s;
+}
+
+/* ===========================
+   DARK MODE
+=========================== */
+
+body.dark{
+
+    --bg:#000000;
+    --bg2:#111111;
+    --card:#1A1A1A;
+
+    --text:#F8F8F8;
+    --text2:#B8B8B8;
+
+    --gold:#D4AF37;
+    --gold2:#F2D675;
+
+    --border:rgba(212,175,55,.20);
+
+}
+
+/* ===========================
+   LIGHT MODE
+=========================== */
+
+body.light{
+
+    --bg:#F7F7F7;
+    --bg2:#FFFFFF;
+    --card:#FFFFFF;
+
+    --text:#111111;
+    --text2:#555555;
+
+    --gold:#C49A1E;
+    --gold2:#E2C45A;
+
+    --border:#DDDDDD;
+
+}
+body{
+    background:var(--bg);
+    color:var(--text);
+}
+
+section{
+    background:var(--bg);
+}
+
+h1,h2,h3,h4{
+    color:var(--text);
+}
+
+p{
+    color:var(--text2);
+}
+
+button{
+    color:var(--text);
+}
+
+/* ===========================
+   BODY
+=========================== */
+
+body{
+
+    background:var(--bg);
+
+    color:var(--text);
+
+}
+
+/* ===========================
+   HEADER
+=========================== */
+
+header{
+
+    background:var(--bg2);
+
+    color:var(--text);
+
+    border-bottom:1px solid var(--border);
+
+}
+
+/* ===========================
+   SIDEBAR
+=========================== */
+
+.sidebar{
+
+    background:var(--bg2);
+
+    border-right:1px solid var(--border);
+
+}
+
+/* ===========================
+   CARDS
+=========================== */
+
+.card,
+.ticket-card,
+.profile-card,
+.stat-card,
+.table-wrap,
+.info-box,
+.ticket-item,
+.gate-card{
+
+    background:var(--card);
+
+    color:var(--text);
+
+    border:1px solid var(--border);
+
+}
+
+/* ===========================
+   TABLES
+=========================== */
+
+table{
+
+    background:var(--card);
+
+}
+
+th{
+
+    color:var(--gold);
+
+}
+
+td{
+
+    color:var(--text);
+
+}
+
+/* ===========================
+   INPUTS
+=========================== */
+
+input,
+textarea,
+select{
+
+    background:var(--bg2);
+
+    color:var(--text);
+
+    border:1px solid var(--border);
+
+}
+
+/* ===========================
+   BUTTONS
+=========================== */
+
+button{
+
+    transition:.3s;
+
+}
+
+button:hover{
+
+    transform:translateY(-2px);
+
+}
+
+/* ===========================
+   THEME BUTTON
+=========================== */
+
+.theme-btn{
+
+    width:45px;
+
+    height:45px;
+
+    border-radius:50%;
+
+    border:none;
+
+    cursor:pointer;
+
+    background:var(--gold);
+
+    color:black;
+
+    font-size:18px;
+
+    margin-left:10px;
+
+}
+
+.theme-btn:hover{
+
+    transform:rotate(180deg) scale(1.05);
+
+}
+
+/* ===========================
+   LINKS
+=========================== */
+
+a{
+
+    color:var(--gold);
+
+}
+
+/* ===========================
+   BADGES
+=========================== */
+
+.status{
+
+    background:var(--gold);
+
+    color:black;
+
+}
+body.light{
+
+    --bg:#F5F7FB;
+    --bg2:white;
+    --card:white;
+
+    --text:#0B1B42;
+    --text2:#666;
+
+    --gold:#D4AF37;
+    --border:rgba(0,0,0,.1);
+
+}
+body.dark,
+body.light{
+    transition: .3s ease;
+}
+
+body.dark .ticket-card,
+body.dark .profile-card,
+body.dark .stat-card,
+body.dark .gate-card,
+body.dark .table-wrap{
+    background:var(--card) !important;
+    color:var(--text) !important;
+}
+
+body.dark section{
+    background:var(--bg) !important;
+}
+
+body.dark p{
+    color:var(--text2) !important;
+}
+
+body.dark h1,
+body.dark h2,
+body.dark h3,
+body.dark h4{
+    color:var(--gold) !important;
+}

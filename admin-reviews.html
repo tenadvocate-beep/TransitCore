@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Manage Reviews</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+<style>
+
+body{
+    margin:0;
+    padding:30px;
+    background:#F5F7FB;
+    font-family:Inter,sans-serif;
+}
+
+h1{
+    color:#0B1B42;
+}
+
+table{
+    width:100%;
+    border-collapse:collapse;
+    margin-top:30px;
+    background:white;
+}
+
+th,td{
+    padding:15px;
+    border-bottom:1px solid #eee;
+    text-align:left;
+}
+
+th{
+    background:#0B1B42;
+    color:white;
+}
+
+button{
+    background:#dc2626;
+    color:white;
+    border:none;
+    padding:10px 15px;
+    border-radius:8px;
+    cursor:pointer;
+}
+
+button:hover{
+    opacity:.9;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<h1>⭐ Customer Reviews</h1>
+
+<table>
+
+<thead>
+
+<tr>
+
+<th>User</th>
+<th>Route</th>
+<th>Rating</th>
+<th>Comment</th>
+<th>Action</th>
+
+</tr>
+
+</thead>
+
+<tbody id="reviewsTable">
+
+</tbody>
+
+</table>
+
+<script>
+
+const API_URL = "http://localhost:5000/api/reviews/admin"
+
+async function loadReviews() {
+
+    try {
+
+        const response = await fetch(API_URL);
+
+        const data = await response.json();
+
+        if (!data.success) {
+            alert("Failed to load reviews");
+            return;
+        }
+
+        const table = document.getElementById("reviewsTable");
+
+        table.innerHTML = data.reviews.map(review => `
+
+            <tr>
+
+                <td>${review.user.name}</td>
+
+                <td>
+                    ${review.route.origin} →
+                    ${review.route.destination}
+                </td>
+
+                <td>${"⭐".repeat(review.rating)}</td>
+
+                <td>${review.comment}</td>
+
+                <td>
+                    <button onclick="deleteReview('${review._id}')">
+                        Delete
+                    </button>
+                </td>
+
+            </tr>
+
+        `).join("");
+
+    } catch (error) {
+
+        console.error(error);
+
+    }
+
+}
+
+async function deleteReview(id) {
+
+    if (!confirm("Delete this review?")) return;
+
+    try {
+
+        const response = await fetch(`${API_URL}/${id}`, {
+
+            method: "DELETE",
+
+            headers: {
+    Authorization: `Bearer ${localStorage.getItem("adminToken")}`
+}
+        });
+
+        const data = await response.json();
+
+        alert(data.message);
+
+        loadReviews();
+
+    } catch (error) {
+
+        console.error(error);
+
+    }
+
+}
+
+loadReviews();
+
+
+</script>
+
+</body>
+
+</html>

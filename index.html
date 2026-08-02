@@ -1,0 +1,1458 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>TransitCore — Student Transit, Sorted</title>
+
+<link rel="stylesheet" href="global.css">
+<meta name="description" content="TransitCore coordinates verified intercity travel for Landmark University students, in partnership with GIGM. Real tickets, real support, no wahala.">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<style>
+ .whatsapp-float{
+    position:fixed;
+    right:25px;
+    bottom:25px;
+    width:65px;
+    height:65px;
+    border-radius:50%;
+    background:#25D366;
+    color:white;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    font-size:30px;
+    box-shadow:0 10px 30px rgba(0,0,0,0.25);
+    z-index:999;
+    transition:0.3s;
+}
+
+.whatsapp-float i{
+    font-size:34px;
+}
+
+.whatsapp-float:hover{
+    transform:scale(1.1);
+}
+
+:root{
+    --emerald-deep:#121212;
+    --emerald-black:#000000;
+    --emerald-mid:#1A1A1A;
+    --emerald-soft:#242424;
+
+    --brass:#D4AF37;
+    --brass-light:#F4D03F;
+
+    --ivory:#F8F8F8;
+    --ivory-dim:#D9D9D9;
+
+    --sage:#A8A8A8;
+
+    --rust:#C62828;
+
+    --ink:#111111;
+
+    --line:rgba(212,175,55,.35);
+    --line-dark:rgba(212,175,55,.18);
+
+    /* Theme variables */
+    --bg: var(--emerald-deep);
+    --card: var(--emerald-mid);
+    --text: var(--ivory);
+    --text2: var(--sage);
+}
+  *{box-sizing:border-box;margin:0;padding:0;}
+  html{scroll-behavior:smooth;}
+  body{background:var(--ivory);color:var(--ink);font-family:'Inter',sans-serif;line-height:1.5;-webkit-font-smoothing:antialiased;}
+  img{max-width:100%;display:block;}
+  a{color:inherit;text-decoration:none;}
+  .wrap{max-width:1180px;margin:0 auto;padding:0 28px;}
+  h1,h2,h3{font-family:'Fraunces',serif;letter-spacing:-0.01em;}
+  ::selection{background:var(--brass-light);color:var(--emerald-black);}
+
+  /* ===== NAV ===== */
+  .nav{position:sticky;top:0;z-index:50;background:rgba(10,27,21,0.92);backdrop-filter:blur(10px);border-bottom:1px solid var(--line-dark);}
+  .nav-inner{display:flex;align-items:center;justify-content:space-between;padding:16px 28px;max-width:1180px;margin:0 auto;}
+  .nav-brand{display:flex;align-items:baseline;gap:9px;}
+  .nav-brand .word{font-family:'Fraunces',serif;font-weight:700;font-size:20px;color:var(--ivory);}
+  .nav-brand .tag{font-size:9px;letter-spacing:1.6px;color:var(--sage);text-transform:uppercase;}
+  .nav-links{display:flex;gap:32px;align-items:center;}
+  .nav-links a{font-size:13px;color:var(--ivory-dim);font-weight:500;transition:color 0.2s;}
+  .nav-links a:hover{color:var(--brass-light);}
+  .nav-cta{background:var(--brass);color:var(--emerald-black);font-weight:700;font-size:13px;padding:10px 20px;border-radius:30px;transition:transform 0.25s;}
+  .nav-cta:hover{transform:scale(1.04);}
+  .nav-toggle{display:none;background:none;border:none;color:var(--ivory);font-size:22px;cursor:pointer;}
+  @media (max-width:860px){
+    .nav-links{position:fixed;top:64px;left:0;right:0;background:var(--emerald-black);flex-direction:column;padding:20px 28px;gap:18px;border-bottom:1px solid var(--line);transform:translateY(-130%);transition:transform 0.3s ease;}
+    .nav-links.open{transform:translateY(0);}
+    .nav-toggle{display:block;}
+  }
+
+  /* ===== HERO ===== */
+  .hero{background:radial-gradient(ellipse at 20% -10%, #16255C 0%, var(--emerald-black) 55%);color:var(--ivory);padding:78px 0 60px;position:relative;overflow:hidden;}
+  .hero-content{
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+}
+  .hero::after{content:'';position:absolute;inset:0;background-image:radial-gradient(circle, rgba(43,84,232,0.06) 1px, transparent 1px);background-size:26px 26px;pointer-events:none;}
+  .hero-inner{max-width:1180px;margin:0 auto;padding:0 28px;display:grid;grid-template-columns:1.05fr 0.95fr;gap:56px;align-items:center;position:relative;}
+  @media (max-width:920px){.hero-inner{grid-template-columns:1fr;gap:44px;}}
+  .eyebrow{display:inline-flex;align-items:center;gap:8px;font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:1.5px;color:var(--brass-light);background:rgba(43,84,232,0.1);border:1px solid var(--line);padding:6px 14px;border-radius:20px;text-transform:uppercase;}
+  .eyebrow .dot{width:6px;height:6px;border-radius:50%;background:#4CAF50;animation:pulse 1.4s infinite;}
+  @keyframes pulse{0%,100%{opacity:1;}50%{opacity:0.35;}}
+  .hero h1{font-size:clamp(34px,5vw,56px);font-weight:700;line-height:1.06;margin:22px 0 20px;color:var(--ivory);}
+  .hero h1 em{font-style:normal;color:var(--brass-light);}
+  .hero p.lead{font-size:16.5px;color:var(--sage);max-width:480px;line-height:1.65;margin-bottom:30px;}
+  .hero-ctas{display:flex;gap:14px;flex-wrap:wrap;}
+  .btn{display:inline-flex;align-items:center;gap:8px;padding:14px 26px;border-radius:10px;font-weight:700;font-size:14.5px;cursor:pointer;border:none;transition:all 0.25s;font-family:'Inter',sans-serif;}
+  .btn-primary{background:var(--brass);color:var(--emerald-black);}
+  .btn-primary:hover{transform:translateY(-2px);box-shadow:0 10px 26px rgba(43,84,232,0.28);}
+  .btn-ghost{background:transparent;color:var(--ivory);border:1px solid var(--line);}
+  .btn-ghost:hover{border-color:var(--brass);background:rgba(43,84,232,0.06);}
+  .hero-note{margin-top:20px;font-size:12px;color:var(--sage);display:flex;align-items:center;gap:8px;}
+
+  /* ===== DEPARTURE BOARD (signature element) ===== */
+  .board{background:linear-gradient(180deg,#0D1B45,#0A1530);border:1px solid var(--line);border-radius:16px;padding:20px 20px 14px;box-shadow:0 30px 70px rgba(0,0,0,0.45), inset 0 1px 0 rgba(255,255,255,0.03);}
+  .board-head{display:flex;justify-content:space-between;align-items:center;padding:2px 6px 14px;border-bottom:1px solid var(--line-dark);margin-bottom:12px;}
+  .board-head .bh-title{font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:2px;color:var(--brass-light);text-transform:uppercase;}
+  .board-head .bh-live{font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--sage);display:flex;align-items:center;gap:6px;}
+  .board-head .bh-live .dot{width:6px;height:6px;border-radius:50%;background:#4CAF50;}
+  .board-row{display:grid;grid-template-columns:1.3fr 0.7fr 0.9fr;gap:6px;align-items:center;padding:10px 6px;border-bottom:1px dashed var(--line-dark);}
+  .board-row:last-child{border-bottom:none;}
+  .flap-group{display:flex;gap:3px;}
+  .flap{position:relative;background:#0E2050;border-radius:3px;overflow:hidden;height:26px;display:flex;align-items:center;justify-content:center;font-family:'IBM Plex Mono',monospace;font-weight:600;color:var(--brass-light);font-size:13px;box-shadow:inset 0 0 0 1px rgba(43,84,232,0.15);min-width:15px;}
+  .flap::before{content:'';position:absolute;top:50%;left:0;right:0;height:1px;background:rgba(0,0,0,0.4);z-index:2;}
+  .flap span{transition:opacity 0.15s;}
+  .board-time{font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--ivory-dim);}
+  .board-status{font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:0.5px;padding:4px 8px;border-radius:4px;text-align:center;text-transform:uppercase;}
+  .status-ontime{background:rgba(76,175,80,0.15);color:#7fd88a;}
+  .status-board{background:rgba(43,84,232,0.18);color:var(--brass-light);}
+  .status-sched{background:rgba(138,168,148,0.12);color:var(--sage);}
+  .board-foot{margin-top:12px;padding-top:12px;border-top:1px solid var(--line-dark);font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--sage);text-align:center;letter-spacing:0.5px;}
+
+  /* ===== TRUST BAR ===== */
+  .trust{background:var(--emerald-mid);border-top:1px solid var(--line-dark);border-bottom:1px solid var(--line-dark);padding:22px 0;}
+  .trust-inner{max-width:1180px;margin:0 auto;padding:0 28px;display:flex;justify-content:space-between;flex-wrap:wrap;gap:18px;}
+  .trust-item{display:flex;align-items:center;gap:10px;color:var(--ivory-dim);font-size:13px;font-weight:500;}
+  .trust-item .ic{color:var(--brass-light);font-size:16px;}
+
+  /* ===== SECTION SHARED ===== */
+  section{padding:88px 0;}
+  .sec-head{max-width:640px;margin-bottom:52px;}
+  .sec-eyebrow{font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:2px;color:var(--brass);text-transform:uppercase;margin-bottom:14px;display:block;}
+  .sec-head h2{font-size:clamp(26px,3.4vw,38px);font-weight:600;color:var(--ink);line-height:1.15;}
+  .sec-head p{color:#5B6472;font-size:15.5px;margin-top:14px;max-width:520px;line-height:1.6;}
+
+  /* ===== HOW IT WORKS ===== */
+  .steps{display:grid;grid-template-columns:repeat(3,1fr);gap:0;border:1px solid #DCE3F5;border-radius:16px;overflow:hidden;background:#fff;}
+  @media (max-width:800px){.steps{grid-template-columns:1fr;}}
+  .step{padding:36px 30px;border-right:1px solid #DCE3F5;position:relative;}
+  .step:last-child{border-right:none;}
+  @media (max-width:800px){.step{border-right:none;border-bottom:1px solid #DCE3F5;}.step:last-child{border-bottom:none;}}
+  .step .num{font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--brass);font-weight:600;letter-spacing:1px;}
+  .step h3{font-size:19px;margin:14px 0 8px;font-weight:600;}
+  .step p{font-size:13.8px;color:#5B6472;line-height:1.6;}
+
+  /* ===== ROUTES ===== */
+  .routes-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;}
+  @media (max-width:900px){.routes-grid{grid-template-columns:repeat(2,1fr);}}
+  @media (max-width:600px){.routes-grid{grid-template-columns:1fr;}}
+.route-card{
+  background:linear-gradient(145deg, var(--emerald-deep), var(--emerald-soft));
+  border:1px solid var(--line);
+  border-radius:18px;
+  padding:22px;
+  transition:all 0.25s;
+  position:relative;
+  overflow:hidden;
+  box-shadow:0 12px 30px rgba(0,0,0,.45);
+}
+
+.route-card:hover{
+  border-color:var(--brass);
+  transform:translateY(-5px);
+  box-shadow:0 18px 40px rgba(212,175,55,.20);
+}
+  .route-card .rc-route{display:flex;align-items:center;gap:8px;font-family:'IBM Plex Mono',monospace;font-size:11px;color:#B8C7F5;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:10px;}
+  .route-card .rc-dest{font-family:'Fraunces',serif;font-size:21px;font-weight:600;margin-bottom:4px;color:#F5F7FB;}
+  .route-card .rc-op{font-size:12px;color:#B8C7F5;margin-bottom:16px;}
+  .route-card .rc-foot{display:flex;justify-content:space-between;align-items:center;padding-top:14px;border-top:1px dashed #D8E0F2;}
+  .route-card .rc-price{font-family:'IBM Plex Mono',monospace;font-weight:700;color:var(--emerald-deep);font-size:15px;}
+  .route-card .rc-price span{font-size:10px;color:#7C8598;font-weight:400;display:block;font-family:'Inter',sans-serif;}
+  .route-card .rc-book{
+  font-size:12px;
+  font-weight:700;
+  color:#ffffff;
+  background:var(--brass);
+  padding:8px 14px;
+  border-radius:20px;
+  display:flex;
+  align-items:center;
+  gap:5px;
+  transition:0.25s;
+}
+.route-card .rc-book:hover{
+  transform:translateY(-2px);
+  box-shadow:0 8px 20px rgba(43,84,232,0.35);
+}
+  .routes-note{text-align:center;margin-top:26px;color:#7C8598;font-size:12.5px;}
+.route-logo{
+    width:60px;
+    height:60px;
+    object-fit:contain;
+    margin-bottom:15px;
+}
+
+.route-badge{
+    background:var(--brass);
+    color:white;
+    font-size:10px;
+    font-weight:700;
+    padding:4px 8px;
+    border-radius:20px;
+    letter-spacing:1px;
+}
+  /* ===== WHY ===== */
+  .why{background:var(--emerald-black);color:var(--ivory);}
+  .why .sec-head h2{color:var(--ivory);}
+  .why .sec-head p{color:var(--sage);}
+  .why .sec-eyebrow{color:var(--brass-light);}
+  .why-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:1px;background:var(--line-dark);border:1px solid var(--line-dark);border-radius:16px;overflow:hidden;}
+  @media (max-width:700px){.why-grid{grid-template-columns:1fr;}}
+  .why-item{background:var(--emerald-black);padding:32px;}
+  .why-item .wi-ic{font-size:22px;margin-bottom:14px;display:block;}
+  .why-item h3{font-family:'Fraunces',serif;font-size:18px;font-weight:600;margin-bottom:8px;color:var(--brass-light);}
+  .why-item p{font-size:13.8px;color:var(--sage);line-height:1.65;}
+
+  /* ===== TESTIMONIALS ===== */
+  .testi-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;}
+  @media (max-width:900px){.testi-grid{grid-template-columns:1fr;}}
+  .testi-card{background:#fff;border:1px solid #DCE3F5;border-radius:14px;padding:26px;}
+  .testi-card .tc-quote{font-family:'Fraunces',serif;font-size:15.5px;line-height:1.6;color:var(--ink);margin-bottom:18px;font-style:italic;}
+  .tc-person{display:flex;align-items:center;gap:10px;}
+  .tc-avatar{width:36px;height:36px;border-radius:50%;background:var(--emerald-deep);color:var(--brass-light);display:flex;align-items:center;justify-content:center;font-family:'Fraunces',serif;font-weight:600;font-size:14px;}
+  .tc-name{font-size:13.5px;font-weight:700;}
+  .tc-role{font-size:11.5px;color:#7C8598;}
+
+  /* ===== PARTNER CTA ===== */
+  .cta-band{background:linear-gradient(120deg, var(--emerald-deep), var(--emerald-mid));color:var(--ivory);border-radius:22px;padding:52px 44px;display:flex;justify-content:space-between;align-items:center;gap:30px;flex-wrap:wrap;position:relative;overflow:hidden;}
+  .cta-band::after{content:'✈';position:absolute;right:-10px;top:-20px;font-size:180px;color:rgba(43,84,232,0.06);}
+  .cta-band h2{font-size:clamp(22px,2.8vw,30px);max-width:440px;position:relative;}
+  .cta-band p{color:var(--sage);margin-top:10px;max-width:420px;font-size:14px;position:relative;}
+  .cta-actions{display:flex;gap:12px;flex-wrap:wrap;position:relative;}
+
+  /* ===== FOOTER ===== */
+  footer{background:var(--emerald-black);color:var(--sage);padding:56px 0 26px;border-top:1px solid var(--line-dark);}
+  .foot-grid{display:grid;grid-template-columns:1.4fr 1fr 1fr 1fr;gap:40px;margin-bottom:44px;}
+  @media (max-width:800px){.foot-grid{grid-template-columns:1fr 1fr;}}
+  @media (max-width:520px){.foot-grid{grid-template-columns:1fr;}}
+  .foot-brand .word{font-family:'Fraunces',serif;font-weight:700;font-size:19px;color:var(--ivory);}
+  .foot-brand p{font-size:13px;margin-top:12px;max-width:260px;line-height:1.6;}
+  .foot-col h4{font-size:11px;letter-spacing:1.5px;text-transform:uppercase;color:var(--brass-light);margin-bottom:14px;}
+  .foot-col a, .foot-col span{display:block;font-size:13px;margin-bottom:10px;color:var(--sage);}
+  .foot-col a:hover{color:var(--ivory);}
+  .foot-bottom{display:flex;justify-content:space-between;align-items:center;padding-top:22px;border-top:1px solid var(--line-dark);font-size:12px;flex-wrap:wrap;gap:10px;}
+
+  /* ===== BOOKING MODAL ===== */
+  .modal-overlay{position:fixed;inset:0;background:rgba(10,27,21,0.72);backdrop-filter:blur(3px);display:none;align-items:center;justify-content:center;z-index:200;padding:20px;}
+  .modal-overlay.open{display:flex;}
+  .modal{
+  background:var(--ivory);
+  border-radius:18px;
+  max-width:440px;
+  width:100%;
+  max-height:90vh;
+  overflow-y:auto;
+  padding:32px;
+  position:relative;
+  box-shadow:0 30px 80px rgba(0,0,0,0.5);
+}
+  .modal h3{font-size:22px;margin-bottom:8px;}
+  .modal p{font-size:13.5px;color:#5B6472;margin-bottom:22px;line-height:1.55;}
+  .modal-close{position:absolute;top:18px;right:18px;background:none;border:none;font-size:18px;cursor:pointer;color:#7C8598;}
+  .modal-field{margin-bottom:14px;}
+  .modal-field label{display:block;font-size:11px;text-transform:uppercase;letter-spacing:1px;color:#7C8598;margin-bottom:6px;}
+  .modal-field select, .modal-field input{width:100%;padding:11px 13px;border-radius:8px;border:1px solid #D8E0F2;background:#fff;font-family:'Inter',sans-serif;font-size:14px;}
+  .modal-field select:focus, .modal-field input:focus{outline:none;border-color:var(--brass);}
+  .modal .btn-primary{width:100%;justify-content:center;margin-top:6px;}
+
+  .fade-up{opacity:0;transform:translateY(18px);transition:all 0.7s cubic-bezier(.16,.8,.3,1);}
+  .fade-up.in{opacity:1;transform:translateY(0);}
+
+  .hero-visual{
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    transform:translateY(-40px);
+}
+
+.hero-flyer{
+    width:450px;
+    max-width:100%;
+    border-radius:24px;
+    box-shadow:0 35px 80px rgba(0,0,0,.45);
+    animation:float 5s ease-in-out infinite;
+    position:relative;
+z-index:1;
+}
+
+@keyframes float{
+    0%,100%{
+        transform:translateY(0);
+    }
+    50%{
+        transform:translateY(-10px);
+    }
+}
+.hero-flyer:hover{
+    transform:scale(1.03);
+}
+
+/* ===== NOTIFICATION BELL ===== */
+
+.notification-wrapper{
+    position:relative;
+}
+
+.notification-bell{
+    position:relative;
+    color:white;
+    font-size:22px;
+    cursor:pointer;
+    transition:.3s;
+}
+
+.notification-bell:hover{
+    color:#6E93F5;
+}
+
+.notification-count{
+    position:absolute;
+    top:-8px;
+    right:-8px;
+    background:#ff3b30;
+    color:white;
+    width:18px;
+    height:18px;
+    border-radius:50%;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    font-size:10px;
+    font-weight:bold;
+}
+
+.notification-panel{
+    position:absolute;
+    top:45px;
+    right:0;
+    width:280px;
+    background:white;
+    color:#222;
+    border-radius:14px;
+    box-shadow:0 12px 30px rgba(0,0,0,.2);
+    display:none;
+    overflow:hidden;
+    z-index:1000;
+}
+
+.notification-panel h4{
+    margin:0;
+    padding:15px;
+    background:#0B1B42;
+    color:white;
+    font-size:15px;
+}
+
+.notification-item{
+    padding:14px 16px;
+    border-bottom:1px solid #eee;
+    cursor:pointer;
+    transition:.3s;
+}
+
+.notification-item:last-child{
+    border-bottom:none;
+}
+
+.notification-item:hover{
+    background:#f5f7fb;
+}
+/* ===== PROFILE MENU ===== */
+
+.profile-wrapper{
+    position:relative;
+}
+
+.profile-btn{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    color:white;
+    cursor:pointer;
+    font-size:14px;
+    font-weight:600;
+}
+
+.profile-btn i{
+    font-size:11px;
+}
+
+.profile-menu{
+    position:absolute;
+    top:45px;
+    right:0;
+    width:220px;
+    background:white;
+    border-radius:14px;
+    box-shadow:0 12px 30px rgba(0,0,0,.2);
+    display:none;
+    overflow:hidden;
+    z-index:1000;
+}
+
+.profile-menu a{
+    display:block;
+    padding:14px 16px;
+    color:#222;
+    text-decoration:none;
+    transition:.3s;
+}
+
+.profile-menu a:hover{
+    background:#f5f7fb;
+}
+
+input,
+select,
+textarea{
+    background: var(--card);
+    color: var(--text);
+    border: 1px solid var(--line);
+}
+
+input::placeholder,
+textarea::placeholder{
+    color: var(--text2);
+}
+
+select option{
+    background: var(--card);
+    color: var(--text);
+}
+
+
+
+</style>
+<link rel="stylesheet" href="theme.css">
+
+</head>
+<body>
+
+
+<nav class="nav">
+  <div class="nav-inner">
+    <div class="nav-brand">
+      <span class="word">TransitCore</span>
+      <span class="tag">· Student Transit, Sorted</span>
+    </div>
+    <div class="nav-links" id="navLinks">
+      <a href="#routes">Routes</a>
+      <a href="#how">How it works</a>
+      <a href="#why">Why us</a>
+      <a href="#partners">Partners</a>
+      <a href="#contact">Contact</a>
+    </div>
+   <div style="display:flex;align-items:center;gap:18px;">
+    
+
+    <div class="profile-wrapper">
+
+    <div class="profile-btn" onclick="toggleProfileMenu()">
+        👤
+        <span id="userGreeting">Guest</span>
+        <i class="fas fa-chevron-down"></i>
+    </div>
+
+    <div class="profile-menu" id="profileMenu">
+
+       <a href="profile.html">👤 My Profile</a>
+
+
+        <a href="my-tickets.html">My Tickets</a>
+
+        <a href="#">📖 Booking History</a>
+         
+
+        <a href="#">⚙️ Settings</a>
+
+        <a href="#" onclick="logout()">🚪 Logout</a>
+
+<button id="themeToggle" onclick="event.stopPropagation()">
+    🌙 Dark Mode
+</button>
+    </div>
+
+</div>
+
+    <div class="notification-wrapper">
+
+        <div class="notification-bell" onclick="toggleNotifications()">
+            <i class="fas fa-bell"></i>
+            <span class="notification-count">3</span>
+        </div>
+
+        <div class="notification-panel" id="notificationPanel">
+
+    <h4>Notifications</h4>
+
+    <div id="notificationList">
+        Loading...
+    </div>
+
+</div>
+    </div>
+
+    <a href="#" class="nav-cta" onclick="openBooking(event)">
+        Book a trip
+    </a>
+
+    <button id="logoutBtn"
+            style="display:none;background:none;border:none;color:white;cursor:pointer;font-size:13px;"
+            onclick="logout()">
+        Logout
+    </button>
+
+    <button class="nav-toggle" id="navToggle" aria-label="Menu">
+        ☰
+    </button>
+
+</div>
+
+  </div>
+</nav>
+
+<header class="hero">
+  <div class="hero-inner">
+
+  <div class="hero-content">
+
+    <span class="eyebrow">
+      <span class="dot"></span>
+      Official GIGM Campus Partner
+    </span>
+
+    <h1>
+      Board with confidence.<br>
+      Every trip, <em>verified</em> end to end.
+    </h1>
+
+    <p class="lead">
+      TransitCore coordinates intercity travel for Landmark University students — real GIGM tickets, real desk agents on campus, real support on WhatsApp. No middlemen wahala.
+    </p>
+
+    <div class="hero-ctas">
+      <a href="#" class="btn btn-primary" onclick="openBooking(event)">
+        ✨ Book a trip
+      </a>
+
+      <a href="#routes" class="btn btn-ghost">
+        See all routes
+      </a>
+    </div>
+
+    <div class="hero-note">
+      🎓 Approved by Landmark University Student Affairs · Valid ID mandatory for every trip
+    </div>
+
+  </div>
+
+
+  <div class="hero-visual">
+
+    <img src="images/hero-flyer.png"
+         alt="TransitCore Hero Flyer"
+         class="hero-flyer">
+
+  </div>
+
+
+</div>
+</header>
+
+<div class="trust">
+  <div class="trust-inner">
+    <div class="trust-item"><span class="ic">🛡️</span> Verified GIGM tickets, not screenshots</div>
+    <div class="trust-item"><span class="ic">💬</span> WhatsApp support, before &amp; after travel</div>
+    <div class="trust-item"><span class="ic">🎓</span> Built by a student, for students</div>
+    <div class="trust-item"><span class="ic">📍</span> Desk on campus — real humans, not a call center</div>
+  </div>
+</div>
+
+<section id="how">
+  <div class="wrap">
+    <div class="sec-head fade-up">
+      <span class="sec-eyebrow">The process</span>
+      <h2>Three steps between you and your bus.</h2>
+      <p>No app to download, no long queue at the park. Book from your hostel, get your ticket, travel.</p>
+    </div>
+    <div class="steps fade-up">
+      <div class="step">
+        <span class="num">01</span>
+        <h3>Pick your route</h3>
+        <p>Choose your destination and travel date — either on WhatsApp or at the campus desk. We'll confirm seat availability with GIGM in real time.</p>
+      </div>
+      <div class="step">
+        <span class="num">02</span>
+        <h3>Pay &amp; get your ticket</h3>
+        <p>Pay at the desk or via transfer. You get a real ticket instantly — passenger details, QR code, seat and departure time, all on one slip.</p>
+      </div>
+      <div class="step">
+        <span class="num">03</span>
+        <h3>Show up &amp; travel</h3>
+        <p>Arrive 30 minutes early with your ticket and valid ID. That's it — you're on your way, and we're a WhatsApp message away the whole trip.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="routes"></section>
+  <div class="wrap">
+    <div class="sec-head fade-up">
+      <span class="sec-eyebrow">Where we go</span>
+      <h2>Routes out of Landmark University.</h2>
+      <p>Every route runs on GIGM's licensed fleet. Fares below are indicative — final fare is confirmed at booking.</p>
+    </div>
+    <div class="routes-grid fade-up" id="routesGrid"></div>
+    <div class="routes-note">Don't see your destination? <a href="#" onclick="openBooking(event)" style="color:var(--brass);font-weight:600;">Ask us on WhatsApp</a> — we're adding routes every semester.</div>
+  </div>
+</section>
+
+<section id="why" class="why">
+  <div class="wrap">
+    <div class="sec-head fade-up">
+      <span class="sec-eyebrow">Why TransitCore</span>
+      <h2>We're not a transport company.<br>We're the layer that makes it trustworthy.</h2>
+      <p>TransitCore doesn't own buses. We coordinate — verifying every booking against GIGM's system so you're never left guessing.</p>
+    </div>
+    <div class="why-grid fade-up">
+      <div class="why-item">
+        <span class="wi-ic">🎟️</span>
+        <h3>Real tickets, always</h3>
+        <p>Every booking generates a verifiable ticket with a unique code and QR — not a forwarded screenshot from a park agent.</p>
+      </div>
+      <div class="why-item">
+        <span class="wi-ic">💬</span>
+        <h3>Support that answers</h3>
+        <p>A real WhatsApp line, run by students who understand what "I have a 9am class after this trip" actually means.</p>
+      </div>
+      <div class="why-item">
+        <span class="wi-ic">🪪</span>
+        <h3>Safety by default</h3>
+        <p>Valid ID is mandatory on every trip. It's an extra step at the gate that we think is worth it.</p>
+      </div>
+      <div class="why-item">
+        <span class="wi-ic">🤝</span>
+        <h3>Licensed, not casual</h3>
+        <p>We work exclusively with GIGM's licensed fleet — no unregistered vehicles, no unverified drivers.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="testimonials">
+  <div class="wrap">
+    <div class="sec-head fade-up">
+      <span class="sec-eyebrow">From the desk</span>
+      <h2>What students are saying.</h2>
+    </div>
+    <div class="testi-grid fade-up" id="testiGrid"></div>
+  </div>
+</section>
+
+<section id="partners" style="padding-top:0;">
+  <div class="wrap">
+    <div class="cta-band fade-up">
+      <div>
+        <h2>Ready for your next trip home?</h2>
+        <p>Message us on WhatsApp with your route and travel date — we'll confirm your seat and send your ticket within minutes.</p>
+      </div>
+      <div class="cta-actions">
+        <a href="#" class="btn btn-primary" onclick="openBooking(event)">✨ Book a trip</a>
+        <a href="#contact" class="btn btn-ghost">Talk to the desk</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="reviews">
+
+    <div class="wrap">
+
+        <div class="sec-head fade-up">
+
+            <span class="sec-eyebrow">
+                REAL CUSTOMER REVIEWS
+            </span>
+
+            <h2>What Our Travelers Say</h2>
+
+            <p>
+                Genuine reviews from students who booked their trips with TransitCore.
+            </p>
+
+        </div>
+
+        <div id="reviewsGrid" class="testi-grid">
+
+        </div>
+
+    </div>
+
+</section>
+
+<footer id="contact">
+  <div class="wrap">
+    <div class="foot-grid">
+      <div class="foot-brand">
+        <span class="word">TransitCore</span>
+        <p>Student-focused intercity travel coordination, built at Landmark University and run in partnership with GIGM. A MAG'NESTY Group company.</p>
+      </div>
+      <div class="foot-col">
+        <h4>Explore</h4>
+        <a href="#routes">Routes</a>
+        <a href="#how">How it works</a>
+        <a href="#why">Why us</a>
+        <a href="#testimonials">Testimonials</a>
+      </div>
+      <div class="foot-col">
+        <h4>Get in touch</h4>
+        <span id="footPhone">+234 916 179 3098</span>
+        <span id="footEmail">transitcoreofficial@gmail.com</span>
+        <span>Landmark University, Omu-Aran</span>
+      </div>
+      <div class="foot-col">
+        <h4>Partner</h4>
+        <span>Official GIGM Campus Partner</span>
+        <span>Approved by Landmark University</span>
+      </div>
+    </div>
+    <div class="foot-bottom">
+      <span>© <span id="yr"></span> TransitCore. All rights reserved.</span>
+      <span>Student Transit, Sorted.</span>
+    </div>
+  </div>
+</footer>
+
+<div class="modal-overlay" id="bookingModal">
+  <div class="modal">
+    <button class="modal-close" onclick="closeBooking()">✕</button>
+    <h3>Book your trip</h3>
+    <p>Tell us where you're headed — we'll open WhatsApp with your details pre-filled so the desk can confirm your seat right away.</p>
+    <div class="modal-field">
+      <label>Destination</label>
+      <select id="mDest"></select>
+    </div>
+    <div class="modal-field">
+      <label>Travel date</label>
+      <input type="date" id="mDate">
+    </div>
+    <div class="modal-field">
+  <label>Seat Number</label>
+  <select id="mSeat">
+    <option value="">Loading seats...</option>
+</select>
+</div>
+<div id="tripSummary" style="display:none; background:#f7f9ff; border:1px solid #dbe4ff; border-radius:10px; padding:15px; margin-bottom:15px;">
+
+    <h4>🚌 Trip Summary</h4>
+
+    <p>Fare: <span id="summaryPrice">₦0</span></p>
+
+    <p>Departure: <span id="summaryDeparture">-</span></p>
+
+    <p>Arrival: <span id="summaryArrival">-</span></p>
+
+    <p>Seats Left: <span id="summarySeats">-</span></p>
+
+</div>    
+<div class="modal-field">
+      <label>Your name</label>
+      <input type="text" id="mName" placeholder="e.g. Adaeze Okonkwo">
+    </div>
+    <button onclick="submitBooking()">Proceed to Payment</button>
+  </div>
+</div>
+<a href="https://wa.me/2349161793098"
+   class="whatsapp-float"
+   target="_blank"
+   aria-label="Chat on WhatsApp">
+     <i class="fab fa-whatsapp"></i>
+</a>
+
+<script>
+// ============================================
+// ===== SUPABASE (shared project) =====
+// ============================================
+const SUPABASE_URL = 'https://vrcveqhkxmvmnqeavzrc.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZyY3ZlcWhreG12bW5xZWF2enJjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODM3MjkxNzIsImV4cCI6MjA5OTMwNTE3Mn0.aHWBES5ib8FWKgt6JFuq2RWZj0PpFq5W7tyeydIonoI';
+const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+const WHATSAPP_NUMBER = '234XXXXXXXXXX'; // TODO: replace with the real desk WhatsApp number
+
+// ============================================
+// ===== DEFAULT CONTENT (used until Supabase tables exist / admin edits them) =====
+// ============================================
+const DEFAULT_ROUTES = [];
+
+const DEFAULT_TESTIMONIALS = [
+  {quote:"I booked from my hostel at night and had my ticket before breakfast. Didn't have to step foot in the park until travel day.", name:'Tomiwa A.', role:'300L, Mechatronics Engineering'},
+  {quote:"The WhatsApp line actually replies. When my bus was running late they told me before I even asked.", name:'Chiamaka O.', role:'200L, Computer Science'},
+  {quote:"First time using them was for the Ilorin Airport run. Ticket looked official, driver checked my ID at the gate — felt properly organized.", name:'David E.', role:'400L, Biochemistry'},
+];
+
+const DEFAULT_SETTINGS = { footer_phone:'+234 XXX XXX XXXX', footer_email:'hello@transitcore.ng' };
+
+// ============================================
+// ===== LOAD DYNAMIC CONTENT (graceful fallback if tables don't exist yet) =====
+// ============================================
+async function loadRoutes() {
+
+    try {
+
+        const response = await fetch("http://localhost:5000/api/routes");
+
+        const data = await response.json();
+
+        if (!response.ok) {
+            throw new Error(data.message);
+        }
+
+        currentRoutes = data.routes || [];
+
+        return currentRoutes;
+
+    } catch (e) {
+
+        console.error("Failed to load routes:", e);
+
+        return [];
+
+    }
+
+}
+async function loadTestimonials(){
+  try{
+    const { data, error } = await sb.from('testimonials').select('*').eq('published', true).order('created_at', { ascending:false }).limit(6);
+    if(error) throw error;
+    if(data && data.length) return data;
+    return DEFAULT_TESTIMONIALS;
+  }catch(e){
+    console.warn('testimonials table not found yet — showing defaults.', e.message);
+    return DEFAULT_TESTIMONIALS;
+  }
+}
+
+async function loadSettings(){
+  try{
+    const { data, error } = await sb.from('site_settings').select('*');
+    if(error) throw error;
+    const map = {};
+    (data||[]).forEach(r=> map[r.key] = r.value);
+    return Object.keys(map).length ? map : DEFAULT_SETTINGS;
+  }catch(e){
+    console.warn('site_settings table not found yet — showing defaults.', e.message);
+    return DEFAULT_SETTINGS;
+  }
+}
+
+// ============================================
+// ===== RENDER ROUTES =====
+// ============================================
+function renderRoutes(routes){
+
+  const grid = document.getElementById('routesGrid');
+
+  grid.innerHTML = routes.map(r=>`
+
+    <div class="route-card">
+      <img src="images/transitcore-logo.png" class="route-logo" alt="TransitCore">
+
+<div class="rc-route">
+    <span class="route-badge">BUS</span>
+    ${r.origin} → ${r.destination}
+</div>
+
+      <div class="rc-dest">
+        ${r.destination}
+      </div>
+
+      <div class="rc-op">
+        ${r.departureTime} - ${r.arrivalTime}
+      </div>
+
+      <div class="rc-foot">
+
+        <div class="rc-price">
+          ₦${Number(r.price).toLocaleString()}
+          <span>
+            ${r.availableSeats} seats available
+          </span>
+        </div>
+
+        <a 
+          href="#" 
+          class="rc-book" 
+          onclick="openBooking(event,'${r.destination.replace(/'/g,"\\'")}')">
+          Book →
+        </a>
+
+      </div>
+
+    </div>
+
+  `).join('');
+
+}
+
+// ============================================
+// ===== RENDER TESTIMONIALS =====
+// ============================================
+function renderTestimonials(list){
+  const grid = document.getElementById('testiGrid');
+  grid.innerHTML = list.map(t=>`
+    <div class="testi-card">
+      <div class="tc-quote">"${t.quote}"</div>
+      <div class="tc-person">
+        <div class="tc-avatar">${(t.name||'?').charAt(0)}</div>
+        <div>
+          <div class="tc-name">${t.name}</div>
+          <div class="tc-role">${t.role||''}</div>
+        </div>
+      </div>
+    </div>
+  `).join('');
+}
+
+// ============================================
+// ===== DEPARTURE BOARD =====
+// ============================================
+const BOARD_DATA = [
+  {dest:'LAGOS ISLAND', time:'06:00', status:'ON TIME', cls:'status-ontime'},
+  {dest:'ABUJA', time:'07:30', status:'BOARDING', cls:'status-board'},
+  {dest:'ILORIN AIRPT', time:'09:00', status:'ON TIME', cls:'status-ontime'},
+  {dest:'PORT HARCOURT', time:'11:15', status:'SCHEDULED', cls:'status-sched'},
+  {dest:'KADUNA', time:'13:00', status:'SCHEDULED', cls:'status-sched'},
+];
+function buildFlaps(text, id){
+  return text.split('').map((c,i)=>`<div class="flap" data-target="${c}"><span>${c}</span></div>`).join('');
+}
+function renderBoard(){
+  const rows = document.getElementById('boardRows');
+  rows.innerHTML = BOARD_DATA.map(r=>`
+    <div class="board-row">
+      <div class="flap-group">${buildFlaps(r.dest.padEnd(14,' '))}</div>
+      <div class="board-time">${r.time}</div>
+      <div class="board-status ${r.cls}">${r.status}</div>
+    </div>
+  `).join('');
+}
+function flickerBoard(){
+  const flaps = document.querySelectorAll('.flap');
+  const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ ';
+  flaps.forEach(f=>{
+    if(Math.random() > 0.85){
+      const target = f.getAttribute('data-target');
+      const span = f.querySelector('span');
+      let n = 0;
+      const iv = setInterval(()=>{
+        span.textContent = chars[Math.floor(Math.random()*chars.length)];
+        n++;
+        if(n>3){ clearInterval(iv); span.textContent = target; }
+      },70);
+    }
+  });
+}
+
+// ============================================
+// ===== BOOKING MODAL =====
+// ============================================
+let currentRoutes = [];
+async function loadAvailableSeats(routeId) {
+
+    const seatSelect = document.getElementById("mSeat");
+
+    seatSelect.innerHTML = '<option value="">Loading seats...</option>';
+
+    console.log("Loading seats for route:", routeId);
+
+    try {
+
+        const response = await fetch(
+            `http://localhost:5000/api/bookings/booked-seats/${routeId}`
+        );
+
+        console.log("Response status:", response.status);
+
+        const data = await response.json();
+
+        console.log("Booked seats:", data);
+
+        seatSelect.innerHTML = '<option value="">Select Seat</option>';
+
+        const selectedRoute = currentRoutes.find(route => route._id === routeId);
+
+const totalSeats = selectedRoute ? selectedRoute.availableSeats : 20;
+
+for (let i = 1; i <= totalSeats; i++) {
+
+    if (!data.bookedSeats.includes(i)) {
+        seatSelect.innerHTML += `<option value="${i}">Seat ${i}</option>`;
+    }
+
+}
+
+        console.log("Finished loading seats.");
+
+    } catch (error) {
+
+        console.error("Seat loading error:", error);
+
+        seatSelect.innerHTML =
+            '<option value="">Failed to load seats</option>';
+
+    }
+}
+function openBooking(e, dest) {
+
+    if (e) e.preventDefault();
+
+    const token = localStorage.getItem("token");
+
+    if (!token) {
+        alert("Please log in first to book a trip.");
+        window.location.href = "login.html";
+        return;
+    }
+
+    document.getElementById("bookingModal").classList.add("open");
+
+   if (dest) {
+
+    const sel = document.getElementById("mDest");
+
+    [...sel.options].forEach(o => {
+        if (o.value === dest) {
+            sel.value = dest;
+        }
+    });
+
+    const selectedRoute = currentRoutes.find(
+        route => route.destination === dest
+    );
+
+    if (selectedRoute) {
+        loadAvailableSeats(selectedRoute._id);
+    }
+
+}
+}
+function closeBooking(){
+  document.getElementById('bookingModal').classList.remove('open');
+}
+function populateDestSelect(routes) {
+
+    const sel = document.getElementById("mDest");
+
+    sel.innerHTML = routes.map(route => `
+        <option value="${route.destination}">
+            ${route.destination}
+        </option>
+    `).join("");
+
+    sel.addEventListener("change", updateTripSummary);
+
+    const firstRoute = routes[0];
+
+if (firstRoute) {
+    loadAvailableSeats(firstRoute._id);
+}
+    updateTripSummary();
+}
+
+function updateTripSummary() {
+
+    const destination = document.getElementById("mDest").value;
+
+    const route = currentRoutes.find(
+        r => r.destination === destination
+    );
+
+    if (!route) return;
+
+    document.getElementById("tripSummary").style.display = "block";
+
+    document.getElementById("summaryPrice").textContent =
+        "₦" + Number(route.price).toLocaleString();
+
+    document.getElementById("summaryDeparture").textContent =
+        route.departureTime;
+
+    document.getElementById("summaryArrival").textContent =
+        route.arrivalTime;
+
+    document.getElementById("summarySeats").textContent =
+        route.availableSeats;
+
+    // Reload available seats
+    loadAvailableSeats(route._id);
+}
+async function submitBooking() {
+
+    const dest = document.getElementById("mDest").value;
+    const date = document.getElementById("mDate").value;
+    const name = document.getElementById("mName").value.trim();
+    const seatNumber = Number(document.getElementById("mSeat").value);
+
+    const selectedRoute = currentRoutes.find(
+        route => route.destination === dest
+    );
+
+    console.log("Current Routes:", currentRoutes);
+    console.log("Selected Route:", selectedRoute);
+console.log("Route ID:", selectedRoute._id);
+    console.log("Destination:", dest);
+
+    if (!selectedRoute) {
+        alert("Please select a route.");
+        return;
+    }
+
+    if (!seatNumber) {
+        alert("Please select a seat.");
+        document.getElementById("mSeat").focus();
+        return;
+    }
+
+    if (!name) {
+        alert("Please enter your name.");
+        document.getElementById("mName").focus();
+        return;
+    }
+
+    try {
+
+        // Create booking
+        const bookingResponse = await fetch(
+            "http://localhost:5000/api/bookings",
+            {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": `Bearer ${localStorage.getItem("token")}`
+                },
+              body: JSON.stringify({
+    route: selectedRoute._id,
+    seatNumber,
+    passengerName: name,
+    travelDate: date
+})
+            }
+        );
+
+        const bookingData = await bookingResponse.json();
+
+        if (!bookingData.success) {
+            alert(bookingData.message);
+            return;
+        }
+
+        // Initialize Flutterwave payment
+        const paymentResponse = await fetch(
+            "http://localhost:5000/api/bookings/payment",
+            {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": `Bearer ${localStorage.getItem("token")}`
+                },
+                body: JSON.stringify({
+                    bookingId: bookingData.booking._id,
+                    amount: selectedRoute.price,
+                    email: JSON.parse(localStorage.getItem("user")).email
+                })
+            }
+        );
+
+        const paymentData = await paymentResponse.json();
+
+        if (!paymentData.success) {
+            alert(paymentData.message);
+            return;
+        }
+
+        // Redirect to Flutterwave Checkout
+        window.location.href = paymentData.link;
+
+    } catch (error) {
+
+        console.error(error);
+        alert("Booking failed.");
+
+    }
+
+}
+// ============================================
+// ===== NAV TOGGLE =====
+// ============================================
+document.getElementById('navToggle').addEventListener('click', ()=>{
+  document.getElementById('navLinks').classList.toggle('open');
+});
+document.querySelectorAll('.nav-links a').forEach(a=>{
+  a.addEventListener('click', ()=> document.getElementById('navLinks').classList.remove('open'));
+});
+
+// ============================================
+// ===== SCROLL REVEAL =====
+// ============================================
+const io = new IntersectionObserver((entries)=>{
+  entries.forEach(en=>{ if(en.isIntersecting) en.target.classList.add('in'); });
+},{threshold:0.12});
+document.querySelectorAll('.fade-up').forEach(el=> io.observe(el));
+
+// ============================================
+// ===== INIT =====
+// ============================================
+document.getElementById('yr').textContent = new Date().getFullYear();
+document.getElementById('mDate').valueAsDate = new Date();
+// renderBoard();
+// setInterval(flickerBoard, 3200);
+
+async function loadCustomerReviews() {
+
+    try {
+
+        const response = await fetch("http://localhost:5000/api/reviews");
+
+        const data = await response.json();
+
+        if (!data.success) return;
+
+        const grid = document.getElementById("reviewsGrid");
+
+        grid.innerHTML = data.reviews.map(review => `
+
+            <div class="testi-card">
+
+                <div style="color:#FFD700;font-size:18px;margin-bottom:10px;">
+                    ${"⭐".repeat(review.rating)}
+                </div>
+
+                <div class="tc-quote">
+                    "${review.comment}"
+                </div>
+
+                <div class="tc-person">
+
+                    <div class="tc-avatar">
+                        ${review.user.name.charAt(0)}
+                    </div>
+
+                    <div>
+
+                        <div class="tc-name">
+                            ${review.user.name}
+                        </div>
+
+                        <div class="tc-role">
+                            ${review.route.origin} → ${review.route.destination}
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        `).join("");
+
+    } catch (error) {
+
+        console.error("Failed to load reviews:", error);
+
+    }
+
+}
+
+(async function init(){
+  const [routes, testimonials, settings] = await Promise.all([loadRoutes(), loadTestimonials(), loadSettings()]);
+  currentRoutes = routes;
+  renderRoutes(routes);
+  populateDestSelect(routes);
+  renderTestimonials(testimonials);
+  if(settings.footer_phone) document.getElementById('footPhone').textContent = settings.footer_phone;
+  if(settings.footer_email) document.getElementById('footEmail').textContent = settings.footer_email;
+  await loadCustomerReviews();
+})();
+function checkUser(){
+
+    const user = JSON.parse(localStorage.getItem("user"));
+
+    const greeting = document.getElementById("userGreeting");
+    const logoutBtn = document.getElementById("logoutBtn");
+
+    if(user){
+
+        greeting.innerHTML = `Hi, ${user.name} 👋`;
+        logoutBtn.style.display = "block";
+
+    }
+
+}
+
+
+function logout(){
+
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
+
+    window.location.reload();
+
+}
+
+
+checkUser();
+
+async function loadNotificationCount(){
+
+    const token = localStorage.getItem("token");
+
+    if(!token) return;
+
+    try{
+
+        const response = await fetch(
+            "http://localhost:5000/api/notifications",
+            {
+                headers:{
+                    Authorization:`Bearer ${token}`
+                }
+            }
+        );
+
+        const data = await response.json();
+
+       const unread = data.notifications.filter(n => !n.read).length;
+
+const badge = document.querySelector(".notification-count");
+
+badge.textContent = unread;
+
+badge.style.display = unread > 0 ? "flex" : "none";
+
+    }catch(error){
+
+        console.log(error);
+
+    }
+
+}
+
+loadNotificationCount();
+async function toggleNotifications() {
+
+    const panel = document.getElementById("notificationPanel");
+
+    if(panel.style.display === "block"){
+        panel.style.display = "none";
+        return;
+    }
+
+    panel.style.display = "block";
+
+    const token = localStorage.getItem("token");
+
+    if(!token){
+        document.getElementById("notificationList").innerHTML =
+        "<p>Please login.</p>";
+        return;
+    }
+
+    try{
+
+        const response = await fetch(
+            "http://localhost:5000/api/notifications",
+            {
+                headers:{
+                    Authorization: `Bearer ${token}`
+                }
+            }
+        );
+
+        const data = await response.json();
+
+        const list = document.getElementById("notificationList");
+
+        if(!data.notifications.length){
+
+            list.innerHTML = "<p>No notifications yet.</p>";
+            document.querySelector(".notification-count").textContent = "0";
+            return;
+
+        }
+
+        document.querySelector(".notification-count").textContent =
+        data.notifications.length;
+
+        list.innerHTML = data.notifications.map(n => `
+
+            <div class="notification-item">
+
+                <strong>${n.title}</strong>
+
+                <br>
+
+                <small>${n.message}</small>
+
+            </div>
+
+        `).join("");
+
+        await fetch(
+    "http://localhost:5000/api/notifications/read",
+    {
+        method: "PUT",
+        headers: {
+            Authorization: `Bearer ${token}`
+        }
+    }
+);
+
+badge.textContent = "0";
+badge.style.display = "none";
+
+
+    }catch(error){
+
+        console.error(error);
+
+    }
+
+}
+function toggleProfileMenu() {
+
+    const menu = document.getElementById("profileMenu");
+
+    if (menu.style.display === "block") {
+        menu.style.display = "none";
+    } else {
+        menu.style.display = "block";
+    }
+
+}
+</script>
+<script src="theme.js"></script>
+</body>
+</html>

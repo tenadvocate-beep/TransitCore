@@ -1,0 +1,1570 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>TransitCore — Admin</title>
+<link rel="stylesheet" href="theme.css">
+<link rel="stylesheet" href="global.css">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --emerald-deep:#111111;
+    --emerald-black:#000000;
+    --emerald-mid:#1A1A1A;
+
+    --brass:#D4AF37;
+    --brass-light:#F2D675;
+
+    --ivory:#F8F8F8;
+    --sage:#B8B8B8;
+    --rust:#C0392B;
+    --ink:#1A1A1A;
+
+    --line:rgba(212,175,55,.28);
+    --line-dark:rgba(212,175,55,.15);
+}
+
+body{
+    margin:0;
+    background:linear-gradient(135deg,#000000,#1A1A1A);
+    font-family:'Inter',sans-serif;
+    color:var(--ivory);
+}
+
+  /* ===== GATE ===== */
+  .gate{flex:1;display:flex;align-items:center;justify-content:center;padding:24px;}
+  .gate-card{background:var(--emerald-mid);border:1px solid var(--line);border-radius:14px;padding:38px;max-width:380px;width:100%;text-align:center;}
+  .gate-card h2{font-family:'Fraunces',serif;font-size:20px;margin:0 0 6px;color:var(--brass-light);}
+  .gate-card p{font-size:13px;color:var(--sage);margin:0 0 18px;}
+  .gate-card input{width:100%;padding:12px 14px;border-radius:8px;border:1px solid var(--line);background:var(--emerald-black);color:var(--ivory);font-family:'IBM Plex Mono',monospace;font-size:15px;text-align:center;letter-spacing:3px;}
+  .gate-card button{margin-top:14px;width:100%;padding:12px;border-radius:8px;border:none;background:var(--brass);color:var(--emerald-black);font-weight:700;font-size:14px;cursor:pointer;transition:all 0.25s;}
+  .gate-card button:hover{transform:scale(1.02);}
+  .gate-error{color:var(--rust);font-size:12px;margin-top:10px;min-height:14px;}
+  .gate-back{display:inline-block;margin-top:16px;font-size:12px;color:var(--sage);}
+
+  /* ===== SHELL ===== */
+  .shell{flex:1;display:grid;grid-template-columns:220px 1fr;min-height:100vh;}
+  @media (max-width:840px){.shell{grid-template-columns:1fr;}}
+  .sidebar{background:linear-gradient(180deg,var(--emerald-deep),var(--emerald-black));border-right:1px solid var(--line);padding:22px 16px;display:flex;flex-direction:column;}
+  @media (max-width:840px){.sidebar{border-right:none;border-bottom:1px solid var(--line);flex-direction:row;flex-wrap:wrap;align-items:center;gap:10px;}}
+  .sb-brand{font-family:'Fraunces',serif;font-weight:700;font-size:18px;padding:6px 10px 18px;color:var(--ivory);}
+  .sb-brand small{display:block;font-size:9px;letter-spacing:1.5px;color:var(--sage);text-transform:uppercase;font-family:'Inter',sans-serif;font-weight:600;margin-top:3px;}
+  @media (max-width:840px){.sb-brand{padding:6px 10px;}}
+  .sb-nav{display:flex;flex-direction:column;gap:2px;flex:1;}
+  @media (max-width:840px){.sb-nav{flex-direction:row;flex-wrap:wrap;}}
+  .sb-link{padding:10px 12px;border-radius:8px;font-size:13.5px;font-weight:500;color:var(--sage);cursor:pointer;display:flex;align-items:center;gap:9px;transition:all 0.2s;background:none;border:none;text-align:left;width:100%;font-family:'Inter',sans-serif;}
+  @media (max-width:840px){.sb-link{width:auto;}}
+  .sb-link:hover{background:rgba(212,175,55,0.08);color:var(--ivory);}
+  .sb-link.active{background:var(--brass);color:var(--emerald-black);font-weight:700;}
+  .sb-foot{padding-top:14px;border-top:1px solid var(--line);margin-top:10px;}
+  .sb-foot a{font-size:12px;color:var(--sage);}
+  .sb-logout{font-size:12px;color:var(--rust);background:none;border:none;cursor:pointer;padding:10px 12px;text-align:left;width:100%;font-family:'Inter',sans-serif;}
+
+  .content{padding:28px 32px;overflow-y:auto;max-height:100vh;}
+  @media (max-width:840px){.content{max-height:none;}}
+  .page{display:none;}
+  .page.active{display:block;animation:fadeIn 0.25s ease;}
+  @keyframes fadeIn{from{opacity:0;transform:translateY(6px);}to{opacity:1;transform:translateY(0);}}
+  .page-head{display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:24px;flex-wrap:wrap;gap:14px;}
+  .page-head h1{font-family:'Fraunces',serif;font-size:24px;color:var(--brass-light);}
+  .page-head p{font-size:13px;color:var(--sage);margin-top:4px;}
+
+  /* stat cards */
+  .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:30px;}
+  @media (max-width:800px){.stats{grid-template-columns:repeat(2,1fr);}}
+  .stat-card{background:var(--emerald-mid);border:1px solid var(--line);border-radius:12px;padding:18px 20px;}
+  .stat-card .sc-label{font-size:11px;text-transform:uppercase;letter-spacing:1px;color:var(--sage);margin-bottom:8px;}
+  .stat-card .sc-value{font-family:'IBM Plex Mono',monospace;font-size:26px;font-weight:600;color:var(--ivory);}
+
+  /* tables */
+  .table-wrap{background:var(--emerald-mid);border:1px solid var(--line);border-radius:12px;overflow:hidden;}
+  table{width:100%;border-collapse:collapse;}
+  th{text-align:left;font-size:11px;text-transform:uppercase;letter-spacing:0.8px;color:var(--sage);padding:12px 16px;border-bottom:1px solid var(--line);background:rgba(0,0,0,0.15);}
+  td{
+    padding:12px 16px;
+    font-size:13.5px;
+    color:var(--ivory);
+    border-bottom:1px solid rgba(212,175,55,.12);
+}
+  tr:last-child td{border-bottom:none;}
+  td.mono, .mono{font-family:'IBM Plex Mono',monospace;}
+  .table-toolbar{display:flex;justify-content:space-between;align-items:center;padding:14px 16px;gap:10px;flex-wrap:wrap;}
+  .search-input{padding:8px 12px;border-radius:7px;border:1px solid var(--line);background:var(--emerald-black);color:var(--ivory);font-size:13px;min-width:200px;}
+  .row-actions{display:flex;gap:8px;}
+  .icon-btn{background:none;border:1px solid var(--line);color:var(--ivory);border-radius:6px;padding:5px 9px;font-size:12px;cursor:pointer;transition:all 0.2s;}
+  .icon-btn:hover{border-color:var(--brass);}
+  .icon-btn.danger:hover{border-color:var(--rust);color:var(--rust);}
+  .empty-row{padding:30px;text-align:center;color:var(--sage);font-size:13px;}
+  .badge{font-size:10px;padding:3px 9px;border-radius:20px;font-weight:600;text-transform:uppercase;letter-spacing:0.4px;}
+  .badge.on{background:rgba(76,175,80,0.15);color:#F2D675;}
+  .badge.off{background:rgba(181,72,42,0.15);color:#e08064;}
+
+  /* forms */
+  .card{background:var(--emerald-mid);border:1px solid var(--line);border-radius:12px;padding:22px;margin-bottom:22px;}
+  .card h3{font-family:'Fraunces',serif;font-size:16px;color:var(--brass-light);margin-bottom:16px;}
+  .field-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+  @media (max-width:600px){.field-row{grid-template-columns:1fr;}}
+  .field{margin-bottom:14px;}
+  .field label{display:block;font-size:11px;text-transform:uppercase;letter-spacing:1px;color:var(--sage);margin-bottom:6px;}
+  .field input, .field textarea, .field select{width:100%;padding:10px 12px;border-radius:8px;border:1px solid var(--line);background:var(--emerald-black);color:var(--ivory);font-family:'Inter',sans-serif;font-size:14px;}
+  .field textarea{resize:vertical;min-height:70px;}
+  .field input:focus, .field textarea:focus, .field select:focus{outline:none;border-color:var(--brass);}
+  .btn{padding:11px 20px;border-radius:8px;border:none;background:var(--brass);color:var(--emerald-black);font-weight:700;font-size:13.5px;cursor:pointer;transition:all 0.25s;}
+  .btn:hover{transform:scale(1.02);}
+  .btn.secondary{background:transparent;border:1px solid var(--line);color:var(--ivory);}
+  .btn-row{display:flex;gap:10px;margin-top:6px;}
+  .setup-note{background:rgba(43,84,232,0.08);border:1px solid var(--line);border-radius:10px;padding:14px 16px;font-size:12.5px;color:var(--sage);margin-bottom:20px;line-height:1.6;}
+  .setup-note strong{color:var(--brass-light);}
+
+  .toast{position:fixed;bottom:30px;right:30px;background:var(--emerald-mid);color:var(--ivory);padding:16px 24px;border-radius:12px;border:1px solid var(--brass);box-shadow:0 10px 40px rgba(0,0,0,0.5);font-size:14px;z-index:999;transform:translateY(100px);opacity:0;transition:all 0.4s ease;max-width:380px;}
+  .toast.show{transform:translateY(0);opacity:1;}
+  .toast.success{border-color:#D4AF37;}
+  .toast.error{border-color:var(--rust);}
+  ::-webkit-scrollbar{width:8px;}
+  ::-webkit-scrollbar-thumb{background:var(--emerald-mid);border-radius:8px;}
+
+  .status {
+    padding: 5px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: bold;
+    display: inline-block;
+    text-transform: uppercase;
+}
+
+.status.paid {
+    background: #3A3113;
+    color: #F2D675;
+}
+
+.status.pending {
+    background: #4A3B12;
+    color: #F2D675;
+}
+
+.status.failed {
+    background: #f8d7da;
+    color: #721c24;
+}
+</style>
+</head>
+<body>
+
+  <button id="themeToggle"></button>
+<div class="app">
+
+  <div id="gateScreen" class="gate">
+    <div class="gate-card">
+      <h2>🔐 Admin Access</h2>
+      <p>This panel controls the public TransitCore site. Enter the admin passcode.</p>
+      <input type="password" id="gateInput" placeholder="• • • • • • • •" maxlength="30">
+      <button onclick="tryUnlock()">Enter admin panel</button>
+      <div class="gate-error" id="gateError"></div>
+      <a href="../index.html" class="gate-back">← Back to main site</a>
+    </div>
+  </div>
+
+  <div id="shell" class="shell" style="display:none;">
+    <div class="sidebar">
+      <div class="sb-brand">TransitCore<small>Admin Panel</small></div>
+      <div class="sb-nav">
+        <button class="sb-link active" data-page="dashboard" onclick="showPage('dashboard')">📊 Dashboard</button>
+        <button class="sb-link" data-page="buses" onclick="showPage('buses')">🚌 Bus Management</button>
+        <button class="sb-link" data-page="routes" onclick="showPage('routes')">🗺️ Routes &amp; Pricing</button>
+        <button class="sb-link" data-page="bookings" onclick="showPage('bookings')">🎫 Bookings</button>
+        <button class="sb-link" data-page="testimonials" onclick="showPage('testimonials')">💬 Testimonials</button>
+<button class="sb-link" data-page="reviews" onclick="showPage('reviews')">⭐ Reviews</button>
+<button class="sb-link" data-page="settings" onclick="showPage('settings')">⚙️ Site Settings</button>
+ </div>
+      <div class="sb-foot">
+        <a href="../index.html" target="_blank">↗ View live site</a><br><br>
+        <button class="sb-logout" onclick="logout()">⎋ Log out</button>
+      </div>
+    </div>
+
+    <div class="content">
+
+      <!-- DASHBOARD -->
+      <div class="page active" id="page-dashboard">
+        <div class="page-head">
+          <div><h1>Dashboard</h1><p>Overview of everything running through TransitCore.</p></div>
+        </div>
+        <div class="stats">
+          <div class="stat-card"><div class="sc-label">Total bookings</div><div class="sc-value" id="statBookings">—</div></div>
+          <div class="stat-card"><div class="sc-label">Revenue coordinated</div><div class="sc-value" id="statRevenue">—</div></div>
+          <div class="stat-card"><div class="sc-label">Active routes</div><div class="sc-value" id="statRoutes">—</div></div>
+          <div class="stat-card"><div class="sc-label">Published testimonials</div><div class="sc-value" id="statTesti">—</div></div>
+        </div>
+        <div class="card">
+          <h3>Recent bookings</h3>
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Code</th><th>Passenger</th><th>Route</th><th>Date</th><th>Fare</th></tr></thead>
+              <tbody id="dashRecentBody"><tr><td colspan="5" class="empty-row">Loading…</td></tr></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+<!-- BUSES -->
+<div class="page" id="page-buses">
+
+  <div class="page-head">
+    <div>
+      <h1>Bus Management</h1>
+      <p>Add and manage TransitCore buses.</p>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Add Bus</h3>
+
+    <div class="field">
+      <label>Bus Number</label>
+      <input id="busNumber" placeholder="TC-001">
+    </div>
+
+    <div class="field">
+  <label>Plate Number</label>
+  <input id="plateNumber" placeholder="ABC-123XY">
+</div>
+
+    <div class="field">
+      <label>Driver Name</label>
+      <input id="driverName" placeholder="Driver name">
+    </div>
+
+    <div class="field">
+      <label>Seats</label>
+      <input id="capacity" type="number">
+    </div>
+
+    <button class="btn" onclick="saveBus()">
+      Save Bus
+    </button>
+  </div>
+
+
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th>Bus Number</th>
+          <th>Driver</th>
+          <th>Seats</th>
+        </tr>
+      </thead>
+
+      <tbody id="busesBody">
+        <tr>
+          <td colspan="3" class="empty-row">
+            Loading...
+          </td>
+        </tr>
+      </tbody>
+
+    </table>
+  </div>
+
+</div>
+      <!-- ROUTES -->
+      <div class="page" id="page-routes">
+        <div class="page-head">
+          <div><h1>Routes &amp; Pricing</h1><p>These power the route cards and booking dropdown on the public site.</p></div>
+        </div>
+        <div class="setup-note" id="routesSetupNote" style="display:none;"></div>
+        <div class="card">
+          <h3 id="routeFormTitle">Add a route</h3>
+          <input type="hidden" id="routeId">
+
+<div class="field-row">
+    <div class="field">
+        <label>Origin</label>
+        <input id="routeOrigin" placeholder="Ibadan">
+    </div>
+
+    <div class="field">
+        <label>Destination</label>
+        <input id="routeDest" placeholder="Lagos">
+    </div>
+</div>
+
+<div class="field-row">
+    <div class="field">
+        <label>Departure Time</label>
+        <input id="routeDeparture" placeholder="08:00 AM">
+    </div>
+
+    <div class="field">
+        <label>Arrival Time</label>
+        <input id="routeArrival" placeholder="11:00 AM">
+    </div>
+</div>
+
+<div class="field-row">
+    <div class="field">
+        <label>Price (₦)</label>
+        <input id="routePrice" type="number">
+    </div>
+
+    <div class="field">
+        <label>Available Seats</label>
+        <input id="routeSeats" type="number">
+    </div>
+</div>
+
+<div class="field">
+    <label>Assigned Buses</label>
+    <div id="busList">
+        Loading buses...
+    </div>
+</div>
+          <div class="btn-row">
+            <button class="btn" onclick="saveRoute()">Save route</button>
+            <button class="btn secondary" id="routeCancelBtn" style="display:none;" onclick="resetRouteForm()">Cancel edit</button>
+          </div>
+        </div>
+        <div class="table-wrap">
+          <div class="table-toolbar"><strong style="font-size:13px;">All routes</strong><button class="icon-btn" onclick="loadRoutesAdmin()">⟳ Refresh</button></div>
+          <table>
+            <thead><tr><th>Destination</th><th>Operator</th><th>Fare</th><th>Status</th><th></th></tr></thead>
+            <tbody id="routesBody"><tr><td colspan="5" class="empty-row">Loading…</td></tr></tbody>
+          </table>
+        </div>
+      </div>
+
+
+
+
+      <!-- BOOKINGS -->
+      <div class="page" id="page-bookings">
+        <div class="page-head">
+          <div><h1>Bookings</h1><p>Read-only view of tickets issued from the desk ticketing tool.</p></div>
+        </div>
+        <div class="table-wrap">
+          <div class="table-toolbar">
+
+    <input class="search-input"
+           id="bookingSearch"
+           placeholder="Search name, code, reg no…"
+           oninput="renderBookingsTable()">
+
+    <button class="icon-btn" onclick="loadBookingsAdmin()">
+        ⟳ Refresh
+    </button>
+
+    <button class="btn" onclick="exportBookings()">
+        📤 Export CSV
+    </button>
+
+</div>
+          <table>
+            <thead><tr><th>Code</th><th>Passenger</th><th>Route</th><th>Date</th><th>Seat</th>
+<th>Payment</th></tr></thead>
+            <tbody id="bookingsBody"><tr><td colspan="6" class="empty-row">Loading…</td></tr></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- TESTIMONIALS -->
+      <div class="page" id="page-testimonials">
+        <div class="page-head">
+          <div><h1>Testimonials</h1><p>Shown in the "What students are saying" section on the public site.</p></div>
+        </div>
+        <div class="setup-note" id="testiSetupNote" style="display:none;"></div>
+        <div class="card">
+          <h3 id="testiFormTitle">Add a testimonial</h3>
+          <input type="hidden" id="testiId">
+          <div class="field"><label>Quote</label><textarea id="testiQuote" placeholder="What the student said…"></textarea></div>
+          <div class="field-row">
+            <div class="field"><label>Name</label><input id="testiName" placeholder="e.g. Tomiwa A."></div>
+            <div class="field"><label>Role</label><input id="testiRole" placeholder="e.g. 300L, Mechatronics Engineering"></div>
+          </div>
+          <div class="field">
+            <label>Status</label>
+            <select id="testiPublished"><option value="true">Published — visible on site</option><option value="false">Draft — hidden</option></select>
+          </div>
+          <div class="btn-row">
+            <button class="btn" onclick="saveTesti()">Save testimonial</button>
+            <button class="btn secondary" id="testiCancelBtn" style="display:none;" onclick="resetTestiForm()">Cancel edit</button>
+          </div>
+        </div>
+        <div class="table-wrap">
+          <div class="table-toolbar"><strong style="font-size:13px;">All testimonials</strong><button class="icon-btn" onclick="loadTestiAdmin()">⟳ Refresh</button></div>
+          <table>
+            <thead><tr><th>Quote</th><th>Name</th><th>Status</th><th></th></tr></thead>
+            <tbody id="testiBody"><tr><td colspan="4" class="empty-row">Loading…</td></tr></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- REVIEWS -->
+<div class="page" id="page-reviews">
+
+  <div class="page-head">
+    <div>
+      <h1>Reviews</h1>
+      <p>Manage customer reviews.</p>
+    </div>
+  </div>
+
+  <div class="card">
+
+    <div class="table-wrap">
+      <table>
+
+        <thead>
+          <tr>
+            <th>User</th>
+            <th>Route</th>
+            <th>Rating</th>
+            <th>Comment</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+
+        <tbody id="reviewsBody">
+          <tr>
+            <td colspan="5" class="empty-row">
+              Loading...
+            </td>
+          </tr>
+        </tbody>
+
+      </table>
+    </div>
+
+  </div>
+
+</div>
+
+      <!-- SETTINGS -->
+      <div class="page" id="page-settings">
+        <div class="page-head">
+          <div><h1>Site Settings</h1><p>Contact details shown in the footer of the public site.</p></div>
+        </div>
+        <div class="setup-note" id="settingsSetupNote" style="display:none;"></div>
+        <div class="card">
+          <h3>Contact details</h3>
+          <div class="field-row">
+            <div class="field"><label>Footer phone</label><input id="setPhone" placeholder="+234 XXX XXX XXXX"></div>
+            <div class="field"><label>Footer email</label><input id="setEmail" placeholder="hello@transitcore.ng"></div>
+          </div>
+          <div class="btn-row"><button class="btn" onclick="saveSettings()">Save settings</button></div>
+        </div>
+        <div class="card">
+          <h3>WhatsApp booking number</h3>
+          <p style="font-size:12.5px;color:var(--sage);margin-bottom:14px;">This is set directly in <code>index.html</code> as <code>WHATSAPP_NUMBER</code> for now — update it there before launch.</p>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ============================================
+// ===== SUPABASE (shared project) =====
+// ============================================
+const API_URL = "http://localhost:5000/api";
+// Change this before you share this file with anyone else on the team.
+const ADMIN_PASSCODE = "John+2558";
+
+let routesCache = [], bookingsCache = [], testiCache = [];
+async function adminLogin(){
+
+    try{
+
+        const response = await fetch("http://localhost:5000/api/auth/admin-login",{
+
+            method:"POST",
+
+            headers:{
+                "Content-Type":"application/json"
+            },
+
+            body:JSON.stringify({
+
+                email:"tenadvocate@gmail.com",
+                password:"John+2558"
+
+            })
+
+        });
+
+        const data = await response.json();
+        console.log(data);
+
+        console.log("LOGIN RESPONSE:", data);
+
+        if(data.success){
+
+            localStorage.setItem("adminToken", data.token);
+            return true;
+
+        }else{
+
+            alert(data.message);
+            return false;
+
+        }
+
+    }catch(error){
+
+        console.log(error);
+        alert("Server error");
+        return false;
+
+    }
+
+}
+// ============================================
+// ===== GATE =====
+// ============================================
+async function tryUnlock(){
+
+    const val = document.getElementById("gateInput").value;
+
+    if(val !== ADMIN_PASSCODE){
+
+        document.getElementById("gateError").textContent =
+        "Wrong passcode. Try again.";
+
+        return;
+
+    }
+
+    const loggedIn = await adminLogin();
+
+if(loggedIn){
+
+        sessionStorage.setItem("tc_admin_ok","1");
+
+        document.getElementById("gateScreen").style.display = "none";
+
+        document.getElementById("shell").style.display = "grid";
+
+        initAdmin();
+
+    }else{
+
+        alert("Admin login failed.");
+
+    }
+
+}
+async function initAdmin(){
+
+    await loadRoutesAdmin();
+
+    await loadBusOptions();
+
+    await loadBusesAdmin();
+
+    await loadBookingsAdmin();
+
+    await loadTestiAdmin();
+
+    await loadSettingsAdmin();
+
+}
+
+// ============================================
+// ===== NAV =====
+// ============================================
+function showPage(name){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.sb-link').forEach(b=>b.classList.remove('active'));
+  document.getElementById('page-'+name).classList.add('active');
+  document.querySelector(`.sb-link[data-page="${name}"]`).classList.add('active');
+  if(name === "reviews"){
+    loadReviewsAdmin();
+}
+}
+
+function showToast(message, type='success'){
+  const toast = document.getElementById('toast');
+  toast.textContent = message;
+  toast.className = 'toast ' + type;
+  void toast.offsetWidth;
+  toast.classList.add('show');
+  clearTimeout(toast._t);
+  toast._t = setTimeout(()=> toast.classList.remove('show'), 3800);
+}
+
+const SETUP_HINT = 'This table doesn\'t exist in Supabase yet, so changes here won\'t save until it\'s created. Run <strong>supabase_schema.sql</strong> (included with this project) in your Supabase SQL editor, then refresh.';
+
+// ============================================
+// ===== INIT =====
+// ============================================
+function updateStats() {
+
+    // Total Bookings
+    document.getElementById("statBookings").textContent =
+        bookingsCache.length;
+
+    // Revenue (only paid bookings)
+    let revenue = 0;
+
+    bookingsCache.forEach(booking => {
+
+        if (
+            booking.paymentStatus === "paid" &&
+            booking.route &&
+            booking.route.price
+        ) {
+            revenue += Number(booking.route.price);
+        }
+
+    });
+
+    document.getElementById("statRevenue").textContent =
+        "₦" + revenue.toLocaleString();
+
+    // Active Routes
+    document.getElementById("statRoutes").textContent =
+        routesCache.length;
+
+    // Published Testimonials
+    const published = testiCache.filter(
+        t => t.published === true
+    ).length;
+
+    document.getElementById("statTesti").textContent =
+        published;
+
+}
+  document.getElementById('statBookings').textContent = bookingsCache.length;
+  const revenue = bookingsCache.reduce((sum,b)=> sum + (Number(b.fare)||0), 0);
+  document.getElementById('statRevenue').textContent = '₦' + revenue.toLocaleString();
+  document.getElementById('statRoutes').textContent = routesCache.filter(r=>r.active !== false).length;
+  document.getElementById('statTesti').textContent = testiCache.filter(t=>t.published !== false).length;
+
+  const recent = bookingsCache.slice().reverse().slice(0,6);
+  const body = document.getElementById('dashRecentBody');
+  body.innerHTML = recent.length ? recent.map(b=>`
+    <tr>
+      <td class="mono">${b.code||'—'}</td>
+      <td>${b.cust_name||'—'}</td>
+      <td>${b.origin||'—'} → ${b.destination||'—'}</td>
+      <td class="mono">${b.travel_date||'—'}</td>
+      <td class="mono">₦${Number(b.fare||0).toLocaleString()}</td>
+    </tr>`).join('') : '<tr><td colspan="5" class="empty-row">No bookings yet.</td></tr>';
+
+
+// ============================================
+// ===== ROUTES (Supabase table: routes) =====
+// ============================================
+async function loadRoutesAdmin(){
+  try{
+    const response = await fetch("http://localhost:5000/api/routes");
+
+    const data = await response.json();
+    
+
+    if(!response.ok){
+      throw new Error(data.message);
+    }
+
+    routesCache = data.routes || [];
+
+    document.getElementById('routesSetupNote').style.display = 'none';
+
+  }catch(e){
+
+    routesCache = [];
+
+    document.getElementById('routesSetupNote').style.display = 'block';
+
+    document.getElementById('routesSetupNote').innerHTML =
+    "⚠️ Could not load routes from backend.";
+
+    console.log(e.message);
+  }
+
+  renderRoutesTable();
+  updateStats();
+}
+  
+function renderRoutesTable() {
+
+  const body = document.getElementById("routesBody");
+
+  if (routesCache.length === 0) {
+    body.innerHTML = `
+      <tr>
+        <td colspan="7" class="empty-row">
+          No routes found.
+        </td>
+      </tr>
+    `;
+    return;
+  }
+
+  body.innerHTML = routesCache.map(r => `
+    <tr>
+      <td>${r.origin}</td>
+      <td>${r.destination}</td>
+      <td>${r.departureTime}</td>
+      <td>${r.arrivalTime}</td>
+      <td class="mono">₦${Number(r.price).toLocaleString()}</td>
+      <td>${r.availableSeats}</td>
+      <td>
+        <div class="row-actions">
+
+<button class="icon-btn" onclick='editRoute(${JSON.stringify(r)})'>
+Edit
+</button>
+
+<button class="icon-btn danger" onclick="deleteRoute('${r._id}')">
+Delete
+</button>
+
+</div>
+      </td>
+    </tr>
+  `).join("");
+
+}
+function editRoute(r){
+
+  document.getElementById('routeId').value = r._id;
+
+  document.getElementById('routeOrigin').value = r.origin;
+  document.getElementById('routeDest').value = r.destination;
+
+  document.getElementById('routeDeparture').value = r.departureTime;
+  document.getElementById('routeArrival').value = r.arrivalTime;
+
+  document.getElementById('routePrice').value = r.price;
+  document.getElementById('routeSeats').value = r.availableSeats;
+
+
+  document.getElementById('routeFormTitle').textContent = "Edit route";
+
+  document.getElementById('routeCancelBtn').style.display = "inline-block";
+
+  window.scrollTo({
+      top:0,
+      behavior:"smooth"
+  });
+
+}
+function resetRouteForm(){
+
+  document.getElementById('routeId').value = "";
+
+  document.getElementById('routeOrigin').value = "";
+  document.getElementById('routeDest').value = "";
+
+  document.getElementById('routeDeparture').value = "";
+  document.getElementById('routeArrival').value = "";
+
+  document.getElementById('routePrice').value = "";
+  document.getElementById('routeSeats').value = "";
+
+
+  document.querySelectorAll(".bus-checkbox")
+  .forEach(cb => cb.checked = false);
+
+
+  document.getElementById('routeFormTitle').textContent =
+  "Add a route";
+
+
+  document.getElementById('routeCancelBtn').style.display =
+  "none";
+
+}
+async function loadBusOptions(){
+
+    try{
+
+        const response = await fetch(
+            "http://localhost:5000/api/buses/available"
+        );
+
+        const data = await response.json();
+
+        const container = document.getElementById("busList");
+
+        if(!data.buses || data.buses.length === 0){
+            container.innerHTML = "No available buses";
+            return;
+        }
+
+
+        container.innerHTML = data.buses.map(bus => `
+            <label style="display:block;margin-bottom:8px;">
+                <input 
+                type="checkbox" 
+                class="bus-checkbox"
+                value="${bus._id}">
+                
+                ${bus.busNumber} - ${bus.driverName}
+            </label>
+        `).join("");
+
+
+    }catch(error){
+
+        console.log(error);
+        document.getElementById("busList").innerHTML =
+        "Failed to load buses";
+
+    }
+
+}
+async function saveRoute() {
+
+    const id = document.getElementById("routeId").value;
+
+    const routeData = {
+        origin: document.getElementById("routeOrigin").value.trim(),
+        destination: document.getElementById("routeDest").value.trim(),
+        departureTime: document.getElementById("routeDeparture").value.trim(),
+        arrivalTime: document.getElementById("routeArrival").value.trim(),
+        price: Number(document.getElementById("routePrice").value),
+        availableSeats: Number(document.getElementById("routeSeats").value),
+       assignedBuses: Array.from(
+    document.querySelectorAll(".bus-checkbox:checked")
+).map(cb =>cb.value)
+    };
+
+    if (
+        !routeData.origin ||
+        !routeData.destination ||
+        !routeData.departureTime ||
+        !routeData.arrivalTime ||
+        !routeData.price ||
+        !routeData.availableSeats ||
+        routeData.assignedBuses.length === 0
+    ) {
+        showToast("Please fill in all fields.", "error");
+        return;
+    }
+
+    try {
+
+        let response;
+
+        if (id) {
+
+            response = await fetch(`http://localhost:5000/api/routes/${id}`, {
+                method: "PUT",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(routeData)
+            });
+
+        } else {
+
+            response = await fetch("http://localhost:5000/api/routes", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(routeData)
+            });
+
+        }
+
+        const data = await response.json();
+
+        if (data.success) {
+            showToast("✅ Route saved successfully");
+            resetRouteForm();
+            loadRoutesAdmin();
+        } else {
+            showToast(data.message, "error");
+        }
+
+    } catch (err) {
+        console.error(err);
+        showToast("Server error", "error");
+    }
+}
+    
+  
+
+async function deleteRoute(id){
+  if(!confirm('Delete this route? It will disappear from the public site immediately.')) return;
+
+  try{
+
+    const response = await fetch(`http://localhost:5000/api/routes/${id}`, {
+      method:"DELETE"
+    });
+
+    const data = await response.json();
+
+    if(!response.ok){
+      throw new Error(data.message);
+    }
+
+    showToast('🗑️ Route deleted');
+
+    await loadRoutesAdmin();
+
+  }catch(e){
+
+    showToast('⚠️ Could not delete (' + e.message + ')', 'error');
+
+  }
+}
+
+
+// ============================================
+// ===== BOOKINGS (Supabase table: bookings — read-only here) =====
+// ============================================
+async function loadBookingsAdmin() {
+
+    try {
+
+        const token = localStorage.getItem("adminToken");
+
+        const response = await fetch(
+            "http://localhost:5000/api/bookings/all-bookings",
+            {
+                headers: {
+                    Authorization: `Bearer ${token}`
+                }
+            }
+        );
+
+        const data = await response.json();
+
+        if (!response.ok) {
+            throw new Error(data.message);
+        }
+
+        bookingsCache = data.bookings || [];
+        console.log(bookingsCache);
+
+
+    } catch (e) {
+
+        console.log(e);
+
+        bookingsCache = [];
+
+    }
+renderBookingsTable();
+renderRecentBookings();
+    
+    updateStats();
+
+}
+
+function exportBookings() {
+
+    if (!bookingsCache || bookingsCache.length === 0) {
+        alert("No bookings available to export.");
+        return;
+    }
+
+    let csv =
+`Booking Code,Passenger,Route,Travel Date,Seat,Payment Status\n`;
+
+    bookingsCache.forEach(b => {
+
+        csv += `"${b.bookingCode || ""}",`;
+        csv += `"${b.passengerName || b.user?.name || ""}",`;
+        csv += `"${b.route ? b.route.origin + " → " + b.route.destination : ""}",`;
+        csv += `"${b.travelDate || ""}",`;
+        csv += `"${b.seatNumber || ""}",`;
+        csv += `"${b.paymentStatus || ""}"\n`;
+
+    });
+
+    const blob = new Blob([csv], { type: "text/csv" });
+
+    const url = URL.createObjectURL(blob);
+
+    const a = document.createElement("a");
+
+    a.href = url;
+    a.download = "TransitCore_Bookings.csv";
+
+    a.click();
+
+    URL.revokeObjectURL(url);
+
+}
+
+function renderBookingsTable() {
+
+    const body = document.getElementById("bookingsBody");
+    const search = document
+        .getElementById("bookingSearch")
+        .value
+        .toLowerCase();
+
+    let filtered = bookingsCache.filter(b => {
+
+        return (
+            (b.bookingCode || "").toLowerCase().includes(search) ||
+            (b.passengerName || b.user?.name || "").toLowerCase().includes(search) ||
+            (b.route?.origin || "").toLowerCase().includes(search) ||
+            (b.route?.destination || "").toLowerCase().includes(search) ||
+            String(b.seatNumber).includes(search)
+        );
+
+    });
+
+    if (filtered.length === 0) {
+
+        body.innerHTML = `
+        <tr>
+            <td colspan="6" class="empty-row">
+                No matching bookings found.
+            </td>
+        </tr>`;
+        return;
+
+    }
+
+    body.innerHTML = filtered.map(b => `
+        <tr>
+            <td>${b.bookingCode}</td>
+            <td>${b.passengerName || b.user?.name}</td>
+            <td>${b.route?.origin} → ${b.route?.destination}</td>
+            <td>${new Date(b.travelDate).toLocaleDateString()}</td>
+            <td>Seat ${b.seatNumber}</td>
+            <td>
+    <span class="status ${b.paymentStatus}">
+        ${b.paymentStatus.toUpperCase()}
+    </span>
+</td>
+        </tr>
+    `).join("");
+
+}
+function renderRecentBookings() {
+
+    const body = document.getElementById("dashRecentBody");
+
+    if (!body) return;
+
+    if (bookingsCache.length === 0) {
+
+        body.innerHTML = `
+        <tr>
+            <td colspan="5" class="empty-row">
+                No recent bookings
+            </td>
+        </tr>`;
+        return;
+
+    }
+
+    const recent = [...bookingsCache]
+        .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+        .slice(0, 5);
+
+    body.innerHTML = recent.map(b => `
+        <tr>
+            <td>${b.bookingCode}</td>
+            <td>${b.passengerName || b.user?.name}</td>
+            <td>${b.route?.origin} → ${b.route?.destination}</td>
+            <td>${new Date(b.travelDate).toLocaleDateString()}</td>
+            <td>₦${Number(b.route?.price || 0).toLocaleString()}</td>
+        </tr>
+    `).join("");
+
+}
+
+// ============================================
+// ===== TESTIMONIALS (Supabase table: testimonials) =====
+// ============================================
+async function loadTestiAdmin(){
+  try{
+    const { data, error } = await sb.from('testimonials').select('*').order('created_at', {ascending:false});
+    if(error) throw error;
+    testiCache = data || [];
+    document.getElementById('testiSetupNote').style.display = 'none';
+  }catch(e){
+    testiCache = [];
+    document.getElementById('testiSetupNote').style.display = 'block';
+    document.getElementById('testiSetupNote').innerHTML = SETUP_HINT;
+  }
+  renderTestiTable();
+  updateStats();
+}
+function renderTestiTable(){
+  const body = document.getElementById('testiBody');
+  body.innerHTML = testiCache.length ? testiCache.map(t=>`
+    <tr>
+      <td style="max-width:320px;">${(t.quote||'').slice(0,90)}${(t.quote||'').length>90?'…':''}</td>
+      <td>${t.name||'—'}</td>
+      <td><span class="badge ${t.published!==false?'on':'off'}">${t.published!==false?'Published':'Draft'}</span></td>
+      <td><div class="row-actions">
+        <button class="icon-btn" onclick='editTesti(${JSON.stringify(t).replace(/'/g,"&apos;")})'>Edit</button>
+        <button class="icon-btn danger" onclick="deleteTesti('${t.id}')">Delete</button>
+      </div></td>
+    </tr>`).join('') : '<tr><td colspan="4" class="empty-row">No testimonials yet — add one above.</td></tr>';
+}
+function editTesti(t){
+  document.getElementById('testiId').value = t.id;
+  document.getElementById('testiQuote').value = t.quote;
+  document.getElementById('testiName').value = t.name;
+  document.getElementById('testiRole').value = t.role || '';
+  document.getElementById('testiPublished').value = String(t.published !== false);
+  document.getElementById('testiFormTitle').textContent = 'Edit testimonial';
+  document.getElementById('testiCancelBtn').style.display = 'inline-block';
+  window.scrollTo({top:0, behavior:'smooth'});
+}
+function resetTestiForm(){
+  document.getElementById('testiId').value='';
+  document.getElementById('testiQuote').value='';
+  document.getElementById('testiName').value='';
+  document.getElementById('testiRole').value='';
+  document.getElementById('testiPublished').value='true';
+  document.getElementById('testiFormTitle').textContent='Add a testimonial';
+  document.getElementById('testiCancelBtn').style.display='none';
+}
+async function saveTesti(){
+  const id = document.getElementById('testiId').value;
+  const quote = document.getElementById('testiQuote').value.trim();
+  const name = document.getElementById('testiName').value.trim();
+  const role = document.getElementById('testiRole').value.trim();
+  const published = document.getElementById('testiPublished').value === 'true';
+  if(!quote || !name){ showToast('Quote and name are required.', 'error'); return; }
+  try{
+    if(id){
+      const { error } = await sb.from('testimonials').update({quote, name, role, published}).eq('id', id);
+      if(error) throw error;
+      showToast('✅ Testimonial updated');
+    }else{
+      const { error } = await sb.from('testimonials').insert([{quote, name, role, published}]);
+      if(error) throw error;
+      showToast('✅ Testimonial added');
+    }
+    resetTestiForm();
+    await loadTestiAdmin();
+  }catch(e){
+    showToast('⚠️ Could not save (' + e.message + ')', 'error');
+  }
+}
+async function deleteTesti(id){
+  if(!confirm('Delete this testimonial?')) return;
+  try{
+    const { error } = await sb.from('testimonials').delete().eq('id', id);
+    if(error) throw error;
+    showToast('🗑️ Testimonial deleted');
+    await loadTestiAdmin();
+  }catch(e){
+    showToast('⚠️ Could not delete (' + e.message + ')', 'error');
+  }
+}
+
+async function loadSettingsAdmin(){
+
+    try{
+
+        const token = localStorage.getItem("adminToken");
+
+        const response = await fetch(
+    "http://localhost:5000/api/site-settings",
+            {
+                headers:{
+                    Authorization:`Bearer ${token}`
+                }
+            }
+        );
+
+        const data = await response.json();
+
+        if(!response.ok){
+            throw new Error(data.message);
+        }
+
+        document.getElementById("setPhone").value =
+            data.settings.contactPhone || "";
+
+        document.getElementById("setEmail").value =
+            data.settings.contactEmail || "";
+
+        document.getElementById("settingsSetupNote").style.display = "none";
+
+    }catch(e){
+
+        document.getElementById("settingsSetupNote").style.display = "block";
+        document.getElementById("settingsSetupNote").innerHTML = e.message;
+
+    }
+
+}
+
+async function saveSettings(){
+
+    const phone = document.getElementById("setPhone").value.trim();
+    const email = document.getElementById("setEmail").value.trim();
+
+    try{
+
+        const token = localStorage.getItem("adminToken");
+
+       const response = await fetch(
+    "http://localhost:5000/api/site-settings",
+            {
+                method:"PUT",
+
+                headers:{
+                    "Content-Type":"application/json",
+                    Authorization:`Bearer ${token}`
+                },
+
+                body:JSON.stringify({
+
+                    contactPhone:phone,
+                    contactEmail:email
+
+                })
+
+            }
+        );
+
+        const data = await response.json();
+
+        if(!response.ok){
+            throw new Error(data.message);
+        }
+
+        showToast("✅ Settings saved successfully");
+
+    }catch(e){
+
+        showToast("⚠️ " + e.message,"error");
+
+    }
+
+}
+
+// ===============================
+// BUS MANAGEMENT
+// ===============================
+
+
+async function loadBusesAdmin(){
+
+    try{
+
+        const response = await fetch(
+            "http://localhost:5000/api/buses"
+        );
+
+
+        const data = await response.json();
+
+
+        const body = document.getElementById("busesBody");
+
+
+        if(data.buses.length === 0){
+
+            body.innerHTML = `
+            <tr>
+              <td colspan="3" class="empty-row">
+                No buses available
+              </td>
+            </tr>
+            `;
+
+            return;
+        }
+
+
+
+        body.innerHTML = data.buses.map(bus=>`
+
+        <tr>
+
+            <td>${bus.busNumber}</td>
+
+            <td>${bus.driverName}</td>
+
+            <td>${bus.capacity}</td>
+
+        </tr>
+
+        `).join("");
+
+
+
+    }catch(error){
+
+        console.log(error);
+
+    }
+
+}
+
+
+
+
+
+async function saveBus(){
+
+    const token = localStorage.getItem("adminToken");
+
+    if(!token){
+        showToast("Please login as admin first","error");
+        return;
+    }
+
+    const busData = {
+        busNumber: document.getElementById("busNumber").value.trim(),
+        plateNumber: document.getElementById("plateNumber").value.trim(),
+        driverName: document.getElementById("driverName").value.trim(),
+        capacity: Number(document.getElementById("capacity").value)
+    };
+
+    if(
+        !busData.busNumber ||
+        !busData.plateNumber ||
+        !busData.driverName ||
+        !busData.capacity
+    ){
+        showToast("Please fill in all fields.","error");
+        return;
+    }
+
+    try{
+
+        const response = await fetch(
+            "http://localhost:5000/api/buses",
+            {
+                method:"POST",
+                headers:{
+                    "Content-Type":"application/json",
+                    "Authorization": `Bearer ${token}`
+                },
+                body: JSON.stringify(busData)
+            }
+        );
+
+        const data = await response.json();
+
+        if(data.success){
+
+            showToast("✅ Bus added successfully");
+
+            document.getElementById("busNumber").value = "";
+            document.getElementById("plateNumber").value = "";
+            document.getElementById("driverName").value = "";
+            document.getElementById("capacity").value = "";
+
+            loadBusesAdmin();
+
+        }else{
+
+            showToast(data.message,"error");
+
+        }
+
+    }catch(error){
+
+        console.log(error);
+        showToast("Server error","error");
+
+    }
+}
+async function loadReviewsAdmin(){
+
+    try{
+
+        const response = await fetch(
+    "http://localhost:5000/api/reviews/admin",
+    {
+        headers:{
+            "Authorization": `Bearer ${localStorage.getItem("adminToken")}`
+        }
+    }
+);
+
+
+        const data = await response.json();
+
+
+        const body = document.getElementById("reviewsBody");
+
+
+        if(data.reviews.length === 0){
+
+            body.innerHTML = `
+            <tr>
+                <td colspan="5" class="empty-row">
+                    No reviews available
+                </td>
+            </tr>
+            `;
+
+            return;
+        }
+
+
+        body.innerHTML = data.reviews.map(review=>`
+
+            <tr>
+
+                <td>${review.user?.name || "Unknown"}</td>
+
+                <td>
+                    ${review.route ? 
+                    review.route.origin + " → " + review.route.destination 
+                    : "Unknown"}
+                </td>
+
+                <td>
+                    ⭐ ${review.rating}
+                </td>
+
+                <td>
+                    ${review.comment}
+                </td>
+
+               <td>
+
+    ${
+    review.published
+    ?
+    `<span class="badge on">Published</span>`
+    :
+    `<button 
+    class="btn"
+    onclick="approveReview('${review._id}')">
+    Approve
+    </button>`
+    }
+
+    <button 
+    class="btn danger"
+    onclick="deleteReview('${review._id}')">
+    Delete
+    </button>
+
+</td>
+
+            </tr>
+
+        `).join("");
+
+
+    }catch(error){
+
+        console.log(error);
+
+    }
+
+}
+async function deleteReview(id){
+
+    const token = localStorage.getItem("adminToken");
+
+    if(!token){
+        showToast("Please login as admin first","error");
+        return;
+    }
+
+
+    const confirmDelete = confirm("Delete this review?");
+
+    if(!confirmDelete){
+        return;
+    }
+
+
+    try{
+
+        const response = await fetch(
+            `http://localhost:5000/api/reviews/${id}`,
+            {
+                method:"DELETE",
+                headers:{
+                    "Authorization": `Bearer ${token}`
+                }
+            }
+        );
+
+
+        const data = await response.json();
+
+
+        if(data.success){
+
+            showToast("Review deleted successfully");
+
+            loadReviewsAdmin();
+
+        }else{
+
+            showToast(data.message,"error");
+
+        }
+
+
+    }catch(error){
+
+        console.log(error);
+
+        showToast("Server error","error");
+
+    }
+
+}
+async function approveReview(id){
+
+    const token = localStorage.getItem("adminToken");
+
+    if(!token){
+        showToast("Please login as admin first","error");
+        return;
+    }
+
+    try{
+
+        const response = await fetch(
+            `http://localhost:5000/api/reviews/${id}/approve`,
+            {
+                method:"PATCH",
+                headers:{
+                    "Authorization": `Bearer ${token}`
+                }
+            }
+        );
+
+
+        const data = await response.json();
+
+
+        if(data.success){
+
+            showToast("Review approved ✅");
+
+            loadReviewsAdmin();
+
+        }else{
+
+            showToast(data.message,"error");
+
+        }
+
+
+    }catch(error){
+
+        console.log(error);
+
+        showToast("Server error","error");
+
+    }
+
+}
+</script>
+</body>
+</html>

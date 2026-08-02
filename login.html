@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TransitCore | Login</title>
+
+<style>
+
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:Arial, Helvetica, sans-serif;
+}
+
+body{
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    min-height:100vh;
+    background:linear-gradient(135deg,#000000,#1a1a1a);
+}
+
+.card{
+    width:400px;
+    background:#121212;
+    color:#F8F8F8;
+    padding:35px;
+    border-radius:18px;
+    border:1px solid rgba(212,175,55,.35);
+    box-shadow:0 15px 40px rgba(0,0,0,.45);
+}
+
+h2{
+    text-align:center;
+    margin-bottom:25px;
+    color:#D4AF37;
+}
+
+input{
+    width:100%;
+    padding:13px;
+    margin:10px 0;
+    background:#1F1F1F;
+    color:white;
+    border:1px solid #333;
+    border-radius:8px;
+    outline:none;
+    transition:.3s;
+}
+
+input::placeholder{
+    color:#999;
+}
+
+input:focus{
+    border-color:#D4AF37;
+    box-shadow:0 0 8px rgba(212,175,55,.25);
+}
+
+button{
+    width:100%;
+    padding:13px;
+    margin-top:10px;
+    background:#D4AF37;
+    color:#000;
+    border:none;
+    border-radius:8px;
+    cursor:pointer;
+    font-size:16px;
+    font-weight:bold;
+    transition:.3s;
+}
+
+button:hover{
+    background:#E6C65C;
+    transform:translateY(-2px);
+}
+
+p{
+    margin-top:20px;
+    text-align:center;
+    color:#ccc;
+}
+
+a{
+    color:#D4AF37;
+    text-decoration:none;
+    font-weight:bold;
+}
+
+a:hover{
+    text-decoration:underline;
+}
+
+</style>
+
+
+</head>
+<body>
+
+<div class="card">
+
+<h2>Login</h2>
+
+<input type="email" id="email" placeholder="Email">
+
+<input type="password" id="password" placeholder="Password">
+
+<button onclick="login()">Login</button>
+
+<p>
+Don't have an account?
+<a href="register.html">Register</a>
+</p>
+
+</div>
+
+<script>
+
+async function login(){
+
+const email=document.getElementById("email").value;
+const password=document.getElementById("password").value;
+
+const response=await fetch("http://localhost:5000/api/auth/login",{
+
+method:"POST",
+
+headers:{
+"Content-Type":"application/json"
+},
+
+body:JSON.stringify({
+email,
+password
+})
+
+});
+
+const data = await response.json();
+
+console.log("LOGIN RESPONSE:", data);
+
+if(data.success){
+
+localStorage.setItem("token", data.token);
+localStorage.setItem("user", JSON.stringify(data.user));
+
+alert("Login Successful!");
+
+window.location.href="index.html";
+
+}else{
+
+alert(data.message);
+
+}
+
+}
+
+</script>
+
+</body>
+</html>

@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TransitCore | Register</title>
+<style>
+
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:Arial, Helvetica, sans-serif;
+}
+
+body{
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    min-height:100vh;
+    background:linear-gradient(135deg,#000000,#1a1a1a);
+    padding:20px;
+}
+
+.card{
+    width:430px;
+    background:#121212;
+    color:#F8F8F8;
+    padding:35px;
+    border-radius:18px;
+    border:1px solid rgba(212,175,55,.35);
+    box-shadow:0 15px 40px rgba(0,0,0,.45);
+}
+
+h2{
+    text-align:center;
+    margin-bottom:25px;
+    color:#D4AF37;
+}
+
+input{
+    width:100%;
+    padding:13px;
+    margin:10px 0;
+    background:#1F1F1F;
+    color:#fff;
+    border:1px solid #333;
+    border-radius:8px;
+    outline:none;
+    transition:.3s;
+}
+
+input::placeholder{
+    color:#999;
+}
+
+input:focus{
+    border-color:#D4AF37;
+    box-shadow:0 0 8px rgba(212,175,55,.25);
+}
+
+button{
+    width:100%;
+    padding:13px;
+    margin-top:12px;
+    background:#D4AF37;
+    color:#000;
+    border:none;
+    border-radius:8px;
+    font-size:16px;
+    font-weight:bold;
+    cursor:pointer;
+    transition:.3s;
+}
+
+button:hover{
+    background:#E6C65C;
+    transform:translateY(-2px);
+}
+
+label{
+    color:#ddd;
+    font-size:14px;
+}
+
+p{
+    text-align:center;
+    margin-top:18px;
+    color:#ccc;
+}
+
+a{
+    color:#D4AF37;
+    text-decoration:none;
+    font-weight:bold;
+}
+
+a:hover{
+    text-decoration:underline;
+}
+
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+}
+
+/* your existing CSS... */
+
+a:hover{
+    text-decoration:underline;
+}
+
+
+.terms-modal{
+    position:fixed;
+    top:0;
+    left:0;
+    width:100%;
+    height:100%;
+    background:rgba(0,0,0,.75);
+    display:none;
+    justify-content:center;
+    align-items:center;
+    z-index:9999;
+    padding:20px;
+}
+
+.terms-content{
+    background:#121212;
+    color:#fff;
+    width:100%;
+    max-width:700px;
+    max-height:80vh;
+    overflow-y:auto;
+    border-radius:15px;
+    padding:30px;
+    border:1px solid #D4AF37;
+    box-shadow:0 20px 50px rgba(0,0,0,.5);
+}
+
+.terms-content h2{
+    color:#D4AF37;
+    margin-bottom:20px;
+    text-align:center;
+}
+
+.terms-content ol{
+    padding-left:20px;
+}
+
+.terms-content li{
+    margin-bottom:15px;
+    line-height:1.7;
+}
+
+.terms-content button{
+    margin-top:20px;
+}
+
+</style>
+
+</style>
+
+
+</head>
+
+<body>
+
+<div class="card">
+
+<h2>Create Account</h2>
+
+<input type="text" id="name" placeholder="Full Name">
+
+<input type="email" id="email" placeholder="Email">
+
+<input type="text" id="phone" placeholder="Phone Number">
+
+<input type="password" id="password" placeholder="Password">
+
+<div class="terms-box">
+    <label>
+        <input type="checkbox" id="agreeTerms">
+        I agree to the
+        <a href="#" onclick="openTerms(); return false;">Terms & Conditions</a>
+    </label>
+</div>
+
+<button onclick="register()">Register</button>
+<p>
+Already have an account?
+
+<a href="login.html">Login</a>
+
+</p>
+
+</div>
+
+<script>
+
+async function register(){
+
+const name=document.getElementById("name").value;
+
+const email=document.getElementById("email").value;
+
+const phone=document.getElementById("phone").value;
+
+const password=document.getElementById("password").value;
+
+if (!document.getElementById("agreeTerms").checked) {
+    alert("Please agree to the Terms & Conditions before registering.");
+    return;
+}
+
+const response=await fetch("http://localhost:5000/api/auth/register",{
+
+method:"POST",
+
+headers:{
+"Content-Type":"application/json"
+},
+
+body:JSON.stringify({
+name,
+email,
+phone,
+password
+})
+
+});
+
+const data=await response.json();
+
+alert(data.message);
+
+if(data.success){
+
+window.location.href="login.html";
+
+}
+
+}
+
+function openTerms() {
+    document.getElementById("termsModal").style.display = "flex";
+}
+
+function closeTerms() {
+    document.getElementById("termsModal").style.display = "none";
+}
+
+</script>
+
+<div id="termsModal" class="terms-modal" style="display:none;">
+
+    <div class="terms-content">
+
+        <h2>TransitCore Terms & Conditions</h2>
+
+<ol>
+
+<li>Passengers must provide accurate personal information during registration and booking.</li>
+
+<li>Passengers must arrive at the departure terminal at least <strong>30 minutes before departure</strong>. Late passengers may miss their scheduled trip.</li>
+
+<li>Each passenger is allowed a maximum of <strong>two (2) bags</strong>. Additional luggage may attract extra charges or may not be accepted if there is insufficient space.</li>
+
+<li><strong>All bookings are final.</strong> TransitCore operates a <strong>strict no-refund policy</strong> after payment has been confirmed.</li>
+
+<li>No smoking, alcohol, illegal substances, or dangerous items are permitted on any TransitCore vehicle.</li>
+
+<li>Passengers must present a valid booking confirmation before boarding and may be required to provide a valid means of identification.</li>
+
+<li>TransitCore may delay or reschedule trips due to weather, traffic, road conditions, mechanical issues, or other unforeseen circumstances.</li>
+
+<li>TransitCore is not responsible for personal belongings left unattended or forgotten on buses.</li>
+
+<li>By creating an account or booking a trip, you confirm that you have read, understood, and agreed to these Terms & Conditions.</li>
+
+</ol>
+
+        <button onclick="closeTerms()">Close</button>
+
+    </div>
+
+</div>
+
+</body>
+</html>

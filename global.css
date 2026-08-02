@@ -1,0 +1,124 @@
+*{
+    box-sizing:border-box;
+}
+
+
+body{
+
+    margin:0;
+
+    background:var(--bg);
+
+    color:var(--text);
+
+    font-family:Poppins, sans-serif;
+
+    transition:0.3s;
+
+}
+
+
+/* Header */
+
+header{
+
+    background:var(--bg2);
+
+    color:var(--text);
+
+    border-bottom:1px solid var(--border);
+
+}
+
+
+/* Common Cards */
+
+.card,
+.ticket-card,
+.profile-card,
+.stat-card,
+.gate-card,
+.table-wrap{
+
+    background:var(--card);
+
+    color:var(--text);
+
+    border:1px solid var(--border);
+
+}
+
+
+/* Titles */
+
+h1,
+h2,
+h3{
+
+    color:var(--gold);
+
+}
+
+
+/* Paragraph text */
+
+p,
+small{
+
+    color:var(--text2);
+
+}
+
+
+/* Inputs */
+
+input,
+select,
+textarea{
+
+    background:var(--bg2);
+
+    color:var(--text);
+
+    border:1px solid var(--border);
+
+}
+
+
+/* Buttons */
+
+button{
+
+    background:var(--gold);
+
+    color:black;
+
+    border:none;
+
+    cursor:pointer;
+
+}
+#themeToggle{
+
+    width:100%;
+
+    background:transparent;
+
+    color:var(--text);
+
+    text-align:left;
+
+    padding:12px;
+
+    border-radius:8px;
+
+    font-size:15px;
+
+}
+
+
+#themeToggle:hover{
+
+    background:var(--border);
+
+}

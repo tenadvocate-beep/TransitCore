@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>My Profile | TransitCore</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+
+<style>
+
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:Inter,sans-serif;
+}
+
+body{
+    background:#111111;
+    color:#F8F8F8;
+}
+header{
+    background:#000000;
+    color:#F8F8F8;
+    padding:20px 40px;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    border-bottom:1px solid rgba(212,175,55,.25);
+}
+
+header h2{
+    font-size:24px;
+}
+
+.back-btn{
+    color:white;
+    text-decoration:none;
+    font-weight:600;
+}
+
+.profile-container{
+    max-width:900px;
+    margin:50px auto;
+    padding:0 20px;
+}
+
+.profile-card{
+    background:#1A1A1A;
+    border-radius:20px;
+    padding:35px;
+    border:1px solid rgba(212,175,55,.25);
+    box-shadow:0 15px 40px rgba(0,0,0,.35);
+}
+
+.profile-top{
+    display:flex;
+    align-items:center;
+    gap:25px;
+    margin-bottom:35px;
+}
+
+.avatar{
+    width:100px;
+    height:100px;
+    border-radius:50%;
+    background:#D4AF37;
+    color:#000;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    font-size:40px;
+    font-weight:bold;
+}
+
+.profile-info h2{
+    color:#F2D675;
+    margin-bottom:6px;
+}
+.profile-info p{
+    color:#B8B8B8;
+}
+
+.info-grid{
+    display:grid;
+    grid-template-columns:repeat(2,1fr);
+    gap:20px;
+    margin-top:20px;
+}
+
+.info-box{
+    background:#111111;
+    border:1px solid rgba(212,175,55,.18);
+    border-radius:12px;
+    padding:18px;
+}
+
+.info-box span{
+    display:block;
+    color:#B8B8B8;
+    font-size:13px;
+    margin-bottom:6px;
+}
+
+.info-box strong{
+    color:#F8F8F8;
+    font-size:17px;
+}
+
+.edit-btn{
+    margin-top:30px;
+    background:#D4AF37;
+    color:#000;
+    border:none;
+    padding:14px 28px;
+    border-radius:10px;
+    cursor:pointer;
+    font-size:15px;
+    font-weight:700;
+    transition:.3s;
+}
+
+.edit-btn:hover{
+    background:#F2D675;
+    transform:translateY(-2px);
+}
+@media(max-width:700px){
+
+.profile-top{
+    flex-direction:column;
+    text-align:center;
+}
+
+.info-grid{
+    grid-template-columns:1fr;
+}
+
+}
+
+</style>
+
+</head>
+<body>
+
+<header>
+
+<h2>TransitCore</h2>
+
+<a href="index.html" class="back-btn">
+<i class="fas fa-arrow-left"></i>
+ Back Home
+</a>
+
+</header>
+
+<div class="profile-container">
+
+<div class="profile-card">
+
+<div class="profile-top">
+
+<div class="avatar">
+<i class="fas fa-user"></i>
+</div>
+
+<div class="profile-info">
+
+<h2 id="userName">Loading...</h2>
+
+<p id="userEmail">Loading...</p>
+
+</div>
+
+</div>
+
+<div class="info-grid">
+
+<div class="info-box">
+
+<span>Full Name</span>
+
+<strong id="fullName">Loading...</strong>
+
+</div>
+
+<div class="info-box">
+
+<span>Email</span>
+
+<strong id="email">Loading...</strong>
+
+</div>
+
+<div class="info-box">
+
+<span>Phone Number</span>
+
+<strong id="phone">Loading...</strong>
+
+</div>
+
+<div class="info-box">
+
+<span>Status</span>
+
+<strong>Verified User ✅</strong>
+
+</div>
+
+</div>
+
+<button class="edit-btn" onclick="openEditModal()">
+    <i class="fas fa-pen"></i>
+    Edit Profile
+</button>
+
+</div>
+
+</div>
+<div id="editModal"
+     style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);justify-content:center;align-items:center;">
+
+    <div style="background:white;padding:30px;border-radius:18px;width:90%;max-width:400px;">
+
+        <h2>Edit Profile</h2>
+
+        <br>
+
+        <input id="editName"
+               placeholder="Full Name"
+               style="width:100%;padding:12px;margin-bottom:15px;">
+
+        <input id="editPhone"
+               placeholder="Phone Number"
+               style="width:100%;padding:12px;margin-bottom:20px;">
+
+        <button onclick="saveProfile()" class="edit-btn">
+            Save Changes
+        </button>
+
+        <button onclick="closeEditModal()"
+                style="margin-left:10px;background:#ddd;border:none;padding:14px 20px;border-radius:10px;">
+            Cancel
+        </button>
+
+    </div>
+
+</div>
+
+<script>
+
+const user = JSON.parse(localStorage.getItem("user"));
+
+if(user){
+
+document.getElementById("userName").textContent = user.name;
+
+document.getElementById("fullName").textContent = user.name;
+
+document.getElementById("email").textContent = user.email;
+
+document.getElementById("userEmail").textContent = user.email;
+
+document.getElementById("phone").textContent =
+user.phone || "Not Available";
+
+}else{
+
+window.location.href="login.html";
+
+}
+function openEditModal(){
+
+    const user = JSON.parse(localStorage.getItem("user"));
+
+    document.getElementById("editName").value = user.name || "";
+
+    document.getElementById("editPhone").value = user.phone || "";
+
+    document.getElementById("editModal").style.display = "flex";
+
+}
+
+function closeEditModal(){
+
+    document.getElementById("editModal").style.display = "none";
+
+}
+
+function saveProfile(){
+
+    const user = JSON.parse(localStorage.getItem("user"));
+
+    user.name = document.getElementById("editName").value;
+
+    user.phone = document.getElementById("editPhone").value;
+
+    localStorage.setItem("user", JSON.stringify(user));
+
+    alert("Profile updated successfully!");
+
+    location.reload();
+
+}
+</script>
+
+</body>
+</html>

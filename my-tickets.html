@@ -1,0 +1,503 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>My Tickets | TransitCore</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+<link rel="stylesheet"
+href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+
+<style>
+
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:Inter,sans-serif;
+}
+
+body{
+    background:#111111;
+    color:#F8F8F8;
+}
+
+header{
+    background:#000000;
+    border-bottom:1px solid rgba(212,175,55,.25);
+    padding:20px 40px;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    color:#F8F8F8;
+}
+
+header h2{
+font-size:24px;
+}
+
+.back-btn{
+color:white;
+text-decoration:none;
+font-weight:600;
+}
+
+.container{
+max-width:1000px;
+margin:40px auto;
+padding:0 20px;
+}
+
+.page-title{
+    font-size:32px;
+    margin-bottom:30px;
+    color:#F2D675;
+}
+#ticketsContainer{
+display:grid;
+gap:20px;
+}
+
+
+.ticket-card{
+    background:#1A1A1A;
+    border-radius:20px;
+    padding:25px;
+    border-left:6px solid #D4AF37;
+    border:1px solid rgba(212,175,55,.25);
+    box-shadow:0 12px 30px rgba(0,0,0,.35);
+}
+
+.ticket-header{
+
+display:flex;
+
+justify-content:space-between;
+
+margin-bottom:20px;
+
+}
+
+.ticket-route{
+    font-size:22px;
+    font-weight:700;
+    color:#F8F8F8;
+}
+
+.status{
+    background:rgba(212,175,55,.15);
+    color:#F2D675;
+    padding:8px 14px;
+    border-radius:25px;
+    font-size:13px;
+    font-weight:700;
+    border:1px solid rgba(212,175,55,.3);
+}
+
+.ticket-grid{
+
+display:grid;
+
+grid-template-columns:repeat(2,1fr);
+
+gap:15px;
+
+margin-top:20px;
+
+}
+
+.ticket-item{
+    background:#111111;
+    border:1px solid rgba(212,175,55,.18);
+    padding:15px;
+    border-radius:12px;
+}
+.ticket-item span{
+    display:block;
+    font-size:13px;
+    color:#B8B8B8;
+    margin-bottom:5px;
+}
+.ticket-item strong{
+    color:#F8F8F8;
+    font-size:17px;
+}
+.actions{
+
+margin-top:25px;
+
+display:flex;
+
+gap:15px;
+
+flex-wrap:wrap;
+
+}
+
+.btn{
+
+padding:12px 22px;
+
+border:none;
+
+border-radius:10px;
+
+cursor:pointer;
+
+font-weight:600;
+
+}
+
+.view-btn{
+    background:#D4AF37;
+    color:#000;
+}
+.pdf-btn{
+    background:#000;
+    color:#F2D675;
+    border:1px solid rgba(212,175,55,.25);
+}
+
+@media(max-width:700px){
+
+.ticket-grid{
+
+grid-template-columns:1fr;
+
+}
+
+header{
+
+padding:20px;
+
+}
+
+}
+
+</style>
+
+</head>
+
+<body>
+
+<header>
+
+<h2>TransitCore</h2>
+
+<a href="index.html" class="back-btn">
+
+<i class="fas fa-arrow-left"></i>
+
+Home
+
+</a>
+
+</header>
+
+<div class="container">
+
+<h1 class="page-title">
+
+🎫 My Tickets
+
+</h1>
+
+<div id="ticketsContainer">
+
+</div>
+
+</div>
+
+<div id="reviewModal"
+     style="display:none;
+            position:fixed;
+            inset:0;
+            background:rgba(0,0,0,.5);
+            justify-content:center;
+            align-items:center;
+            z-index:9999;">
+
+    <div style="
+        background:white;
+        width:400px;
+        max-width:90%;
+        padding:25px;
+        border-radius:16px;">
+
+        <h2>Leave a Review ⭐</h2>
+
+        <br>
+
+        <label>Rating</label>
+
+        <select id="reviewRating" style="width:100%;padding:10px;margin:10px 0;">
+            <option value="5">⭐⭐⭐⭐⭐</option>
+            <option value="4">⭐⭐⭐⭐</option>
+            <option value="3">⭐⭐⭐</option>
+            <option value="2">⭐⭐</option>
+            <option value="1">⭐</option>
+        </select>
+
+        <label>Comment</label>
+
+        <textarea
+            id="reviewComment"
+            rows="5"
+            style="width:100%;padding:10px;"
+            placeholder="Tell us about your trip..."></textarea>
+
+        <br><br>
+
+        <button
+            onclick="submitReview()"
+            class="btn view-btn">
+
+            Submit Review
+
+        </button>
+
+        <button
+            onclick="closeReviewModal()"
+            class="btn pdf-btn">
+
+            Cancel
+
+        </button>
+
+    </div>
+
+</div>
+
+<script>
+    
+
+const API_URL = "http://localhost:5000/api/bookings";
+
+
+async function loadTickets(){
+
+    const token = localStorage.getItem("token");
+
+    if(!token){
+        alert("Please login first");
+        window.location.href = "login.html";
+        return;
+    }
+
+    try{
+
+        const response = await fetch(
+            `${API_URL}/my-bookings`,
+            {
+                headers:{
+                    "Authorization": `Bearer ${token}`
+                }
+            }
+        );
+
+        const data = await response.json();
+
+        console.log("Tickets:", data);
+
+        if(!data.success){
+            alert(data.message);
+            return;
+        }
+
+        displayTickets(data.bookings);
+
+
+    }catch(error){
+
+        console.error(error);
+        alert("Failed to load tickets");
+
+    }
+
+}
+
+let selectedBooking = "";
+let selectedRoute = "";
+
+function openReviewModal(bookingId, routeId){
+
+    selectedBooking = bookingId;
+    selectedRoute = routeId;
+
+    document.getElementById("reviewModal").style.display = "flex";
+
+}
+
+function closeReviewModal(){
+
+    document.getElementById("reviewModal").style.display = "none";
+
+}
+
+async function submitReview(){
+
+    const rating = Number(document.getElementById("reviewRating").value);
+    const comment = document.getElementById("reviewComment").value.trim();
+
+    if(!comment){
+        alert("Please enter a review.");
+        return;
+    }
+
+    try{
+
+        const response = await fetch(
+            "http://localhost:5000/api/reviews",
+            {
+                method:"POST",
+                headers:{
+                    "Content-Type":"application/json",
+                    "Authorization":"Bearer " + localStorage.getItem("token")
+                },
+                body:JSON.stringify({
+                    booking:selectedBooking,
+                    route:selectedRoute,
+                    rating,
+                    comment
+                })
+            }
+        );
+
+        const data = await response.json();
+
+        if(data.success){
+
+            alert("🎉 Thank you for your review!");
+
+            closeReviewModal();
+
+            document.getElementById("reviewComment").value = "";
+            document.getElementById("reviewRating").value = "5";
+
+        }else{
+
+            alert(data.message);
+
+        }
+
+    }catch(error){
+
+        console.error(error);
+        alert("Failed to submit review.");
+
+    }
+
+}
+
+
+function displayTickets(bookings){
+
+    const container = document.getElementById("ticketsContainer");
+
+
+    if(!bookings.length){
+
+        container.innerHTML = `
+        <div style="
+        background:white;
+        padding:30px;
+        border-radius:15px;
+        text-align:center;">
+        
+        <h3>No tickets yet 🎫</h3>
+        <p>You have not booked any trip.</p>
+
+        </div>`;
+
+        return;
+    }
+
+
+    container.innerHTML = bookings.map(ticket => `
+
+    <div class="ticket-card">
+
+        <div class="ticket-header">
+
+            <div class="ticket-route">
+                ${ticket.route.origin}
+                →
+                ${ticket.route.destination}
+            </div>
+
+            <div class="status">
+                ${ticket.paymentStatus || "Pending"}
+            </div>
+
+        </div>
+
+
+        <div class="ticket-grid">
+
+            <div class="ticket-item">
+                <span>Date</span>
+                <strong>${ticket.travelDate}</strong>
+            </div>
+
+
+            <div class="ticket-item">
+                <span>Seat Number</span>
+                <strong>${ticket.seatNumber}</strong>
+            </div>
+
+
+            <div class="ticket-item">
+                <span>Departure</span>
+                <strong>${ticket.route.departureTime}</strong>
+            </div>
+
+
+            <div class="ticket-item">
+                <span>Arrival</span>
+                <strong>${ticket.route.arrivalTime}</strong>
+            </div>
+
+      <div class="actions">
+
+   <button
+    class="btn view-btn"
+    onclick="window.location.href='ticket.html?booking=${ticket._id}'">
+    View Ticket
+</button>
+
+    <button
+    class="btn pdf-btn"
+    onclick="window.open('ticket.html?booking=${ticket._id}','_blank')">
+    Download PDF
+</button>
+
+    <button
+        class="btn"
+        style="background:#f59e0b;color:white;"
+        onclick="openReviewModal('${ticket._id}','${ticket.route._id}')">
+
+        ⭐ Leave Review
+
+    </button>
+
+</div>
+
+</div>
+
+`).join("");
+}
+
+
+loadTickets();
+
+</script>
+
+</body>
+
+</html>

@@ -1,0 +1,140 @@
+const Bus = require("../models/bus");
+
+
+// CREATE BUS
+const createBus = async (req, res) => {
+    try {
+        const bus = await Bus.create(req.body);
+
+        res.status(201).json({
+            success: true,
+            message: "Bus created successfully",
+            bus
+        });
+
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            message: error.message
+        });
+    }
+};
+
+
+// GET ALL BUSES
+const getBuses = async (req, res) => {
+    try {
+        const buses = await Bus.find();
+
+        res.status(200).json({
+            success: true,
+            buses
+        });
+
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            message: error.message
+        });
+    }
+};
+// GET AVAILABLE BUSES
+const getAvailableBuses = async (req, res) => {
+    try {
+        const buses = await Bus.find({
+            status: "available"
+        });
+
+        res.status(200).json({
+            success: true,
+            buses
+        });
+
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            message: error.message
+        });
+    }
+};
+
+
+// GET SINGLE BUS
+const getBus = async (req, res) => {
+    try {
+        const bus = await Bus.findById(req.params.id);
+
+        if (!bus) {
+            return res.status(404).json({
+                success: false,
+                message: "Bus not found"
+            });
+        }
+
+        res.status(200).json({
+            success: true,
+            bus
+        });
+
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            message: error.message
+        });
+    }
+};
+
+
+// UPDATE BUS
+const updateBus = async (req, res) => {
+    try {
+        const bus = await Bus.findByIdAndUpdate(
+            req.params.id,
+            req.body,
+            {
+                new: true
+            }
+        );
+
+        res.status(200).json({
+            success: true,
+            message: "Bus updated successfully",
+            bus
+        });
+
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            message: error.message
+        });
+    }
+};
+
+
+// DELETE BUS
+const deleteBus = async (req, res) => {
+    try {
+        await Bus.findByIdAndDelete(req.params.id);
+
+        res.status(200).json({
+            success: true,
+            message: "Bus deleted successfully"
+        });
+
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            message: error.message
+        });
+    }
+};
+
+
+module.exports = {
+    createBus,
+    getBuses,
+    getAvailableBuses,
+    getBus,
+    updateBus,
+    deleteBus
+};
