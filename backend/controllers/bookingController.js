@@ -32,11 +32,20 @@ const createBooking = async (req, res) => {
             });
         }
 
+console.log({
+    route,
+    seatNumber,
+    travelDate
+});
+
         const existingBooking = await Booking.findOne({
-            route,
-            seatNumber,
-            bookingStatus: { $ne: "cancelled" }
-        });
+    route,
+    seatNumber,
+    travelDate,
+    bookingStatus: { $ne: "cancelled" }
+});
+
+console.log("Existing booking:", existingBooking);
 
         if (existingBooking) {
             return res.status(400).json({
@@ -326,6 +335,11 @@ const qrCode = await QRCode.toDataURL(qrData);
             route.availableSeats -= 1;
 
             await route.save();
+            return res.redirect(
+
+  `https://transit-core-pi.vercel.app/ticket.html?booking=${booking._id}`
+
+);
 
         }
 
@@ -413,8 +427,7 @@ p{
 
 setTimeout(function(){
 
-window.location.href="https://transitcore-ylgu.onrender.com/ticket.html?booking=${booking._id}";
-
+window.location.href = "https://transit-core-pi.vercel.app/ticket.html?booking=" + booking._id;
 },3000);
 
 </script>

@@ -1201,13 +1201,13 @@ console.log("Payment link:", paymentData.link);
       
 
     } catch (error) {
-
-        console.error(error);
-        alert("Booking failed.");
+    console.error(error);
+    alert(error.message || "Booking failed.");
+}
 
     }
 
-}
+
 // ============================================
 // ===== NAV TOGGLE =====
 // ============================================
