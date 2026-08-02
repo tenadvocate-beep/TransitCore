@@ -113,7 +113,7 @@ async function loadBookings() {
     try {
 
         const res = await fetch(
-            "http://localhost:5000/api/bookings/my-bookings",
+            "http://https://transitcore-ylgu.onrender.com/api/bookings/my-bookings",
             {
                 headers: {
                     Authorization: `Bearer ${token}`
@@ -188,7 +188,7 @@ async function cancelBooking(id) {
     try {
 
         const res = await fetch(
-            `http://localhost:5000/api/bookings/${id}/cancel`,
+            `http://https://transitcore-ylgu.onrender.com/api/bookings/${id}/cancel`,
             {
                 method: "PUT",
                 headers: {

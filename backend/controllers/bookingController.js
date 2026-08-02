@@ -202,7 +202,7 @@ const initializePayment = async (req, res) => {
                 tx_ref: txRef,
                 amount,
                 currency: "NGN",
-                redirect_url: "http://localhost:5000/api/bookings/payment-callback",
+                redirect_url: "http://https://transitcore-ylgu.onrender.com/api/bookings/payment-callback",
                 customer: {
                     email
                 },
