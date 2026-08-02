@@ -413,7 +413,7 @@ p{
 
 setTimeout(function(){
 
-window.location.href="http://localhost:5500/ticket.html?booking=${booking._id}";
+window.location.href="https://transitcore-ylgu.onrender.com/ticket.html?booking=${booking._id}";
 
 },3000);
 

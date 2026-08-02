@@ -1194,7 +1194,11 @@ console.log("Route ID:", selectedRoute._id);
         }
 
         // Redirect to Flutterwave Checkout
+      console.log("Payment data:", paymentData);
+console.log("Payment link:", paymentData.link);
+      
         window.location.href = paymentData.link;
+      
 
     } catch (error) {
 
