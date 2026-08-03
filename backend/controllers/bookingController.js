@@ -16,7 +16,11 @@ const createBooking = async (req, res) => {
     passengerName,
     travelDate
 } = req.body;
-        const selectedRoute = await Route.findById(route);
+       console.time("Find Route");
+
+const selectedRoute = await Route.findById(route);
+
+console.timeEnd("Find Route");
 
         if (!selectedRoute) {
             return res.status(404).json({
@@ -38,12 +42,16 @@ console.log({
     travelDate
 });
 
-        const existingBooking = await Booking.findOne({
+      console.time("Check Existing Booking");
+
+const existingBooking = await Booking.findOne({
     route,
     seatNumber,
     travelDate,
     bookingStatus: { $ne: "cancelled" }
 });
+
+console.timeEnd("Check Existing Booking");
 
 console.log("Existing booking:", existingBooking);
 
@@ -70,57 +78,15 @@ const booking = new Booking({
 
 console.log("Before save:", booking);
 
+console.time("Save Booking");
+
 await booking.save();
 
+console.timeEnd("Save Booking");
+
 console.log("After save:", booking);
-await Notification.create({
-    user: req.user.id,
-    title: "🎫 Booking Confirmed",
-    message: `Your seat ${seatNumber} to ${selectedRoute.destination} has been booked successfully.`
-});
 
-// Send booking confirmation email
-try {
 
-    const user = await User.findById(req.user.id);
-
-    if (user && user.email) {
-
-        await sendEmail({
-            to: user.email,
-            subject: "TransitCore Booking Confirmation",
-            html: `
-                <h2>Booking Successful 🎉</h2>
-
-                <p>Hello ${user.name},</p>
-
-                <p>Your TransitCore trip has been successfully booked.</p>
-
-                <hr>
-
-                <p><b>Route:</b> ${selectedRoute.origin} → ${selectedRoute.destination}</p>
-
-                <p><b>Seat:</b> ${seatNumber}</p>
-
-                <p><b>Travel Date:</b> ${travelDate}</p>
-
-                <p><b>Booking Code:</b> ${bookingCode}</p>
-
-                <br>
-
-                <p>Thank you for choosing TransitCore.</p>
-            `
-        });
-
-        console.log("Booking email sent");
-
-    }
-
-} catch(emailError){
-
-    console.log("Email failed:", emailError.message);
-
-}
 
         
 
@@ -314,6 +280,54 @@ if (booking.paymentStatus === "paid") {
         booking.bookingStatus = "confirmed";
 
         await booking.save();
+
+        await Notification.create({
+    user: booking.user,
+    title: "🎫 Booking Confirmed",
+    message: `Your seat ${booking.seatNumber} has been booked successfully.`
+});
+
+try {
+
+    const user = await User.findById(booking.user);
+
+    if (user && user.email) {
+
+        await sendEmail({
+            to: user.email,
+            subject: "TransitCore Booking Confirmation",
+            html: `
+                <h2>Booking Successful 🎉</h2>
+
+                <p>Hello ${user.name},</p>
+
+                <p>Your TransitCore trip has been successfully booked.</p>
+
+                <hr>
+
+                <p><b>Route:</b> ${populatedBooking.route.origin} → ${populatedBooking.route.destination}</p>
+
+                <p><b>Seat:</b> ${booking.seatNumber}</p>
+
+                <p><b>Travel Date:</b> ${booking.travelDate}</p>
+
+                <p><b>Booking Code:</b> ${booking.bookingCode}</p>
+
+                <br>
+
+                <p>Thank you for choosing TransitCore.</p>
+            `
+        });
+
+        console.log("Booking email sent");
+
+    }
+
+} catch (emailError) {
+
+    console.log("Email failed:", emailError.message);
+
+}
 
 const populatedBooking = await Booking.findById(booking._id)
     .populate("user")
