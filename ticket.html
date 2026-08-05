@@ -262,6 +262,8 @@ const response = await fetch(
 `https://transitcore-ylgu.onrender.com/api/bookings/${bookingId}`
 );
 
+console.log(response.status);
+
 const data = await response.json();
 console.log("Full API response:", data);
 const booking = data.booking;

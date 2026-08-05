@@ -1164,6 +1164,9 @@ console.log("Route ID:", selectedRoute._id);
 
         const bookingData = await bookingResponse.json();
 
+        console.log("Booking response:", bookingData);
+console.log("About to initialize payment...");
+
         if (!bookingData.success) {
             alert(bookingData.message);
             return;

@@ -418,17 +418,21 @@ function displayTickets(bookings){
         return;
     }
 
+container.innerHTML = bookings.map(ticket => {
 
-    container.innerHTML = bookings.map(ticket => `
+    const route = ticket.route || {};
+
+    return `
+    
 
     <div class="ticket-card">
 
         <div class="ticket-header">
 
             <div class="ticket-route">
-                ${ticket.route.origin}
+                ${route.origin || "Route unavailable"}
                 →
-                ${ticket.route.destination}
+               ${route.destination || ""}
             </div>
 
             <div class="status">
@@ -454,13 +458,13 @@ function displayTickets(bookings){
 
             <div class="ticket-item">
                 <span>Departure</span>
-                <strong>${ticket.route.departureTime}</strong>
+                <strong>${route.departureTime || "N/A"}</strong>
             </div>
 
 
             <div class="ticket-item">
                 <span>Arrival</span>
-                <strong>${ticket.route.arrivalTime}</strong>
+                <strong>${route.departureTime || "N/A"}</strong>
             </div>
 
       <div class="actions">
@@ -480,7 +484,7 @@ function displayTickets(bookings){
     <button
         class="btn"
         style="background:#f59e0b;color:white;"
-        onclick="openReviewModal('${ticket._id}','${ticket.route._id}')">
+        onclick="openReviewModal('${ticket._id}','${route._id || ""}')">
 
         ⭐ Leave Review
 
@@ -490,7 +494,8 @@ function displayTickets(bookings){
 
 </div>
 
-`).join("");
+`;
+}).join("");
 }
 
 
