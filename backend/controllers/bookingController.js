@@ -285,6 +285,10 @@ if (booking.paymentStatus === "paid") {
 
         await booking.save();
 
+        const populatedBooking = await Booking.findById(booking._id)
+    .populate("user")
+    .populate("route");
+
         await Notification.create({
     user: booking.user,
     title: "🎫 Booking Confirmed",
@@ -333,9 +337,7 @@ try {
 
 }
 
-const populatedBooking = await Booking.findById(booking._id)
-    .populate("user")
-    .populate("route");
+
 
 const qrData = JSON.stringify({
     bookingCode: populatedBooking.bookingCode,
