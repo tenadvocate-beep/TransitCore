@@ -464,7 +464,7 @@ container.innerHTML = bookings.map(ticket => {
 
             <div class="ticket-item">
                 <span>Arrival</span>
-                <strong>${route.departureTime || "N/A"}</strong>
+               <strong>${route.arrivalTime || "N/A"}</strong>
             </div>
 
       <div class="actions">
@@ -477,19 +477,20 @@ container.innerHTML = bookings.map(ticket => {
 
     <button
     class="btn pdf-btn"
-    onclick="window.open('ticket.html?booking=${ticket._id}','_blank')">
+    onclick="window.open('https://transit-core-pi.vercel.app/ticket.html?booking=${ticket._id}','_blank')"
     Download PDF
 </button>
 
-    <button
-        class="btn"
-        style="background:#f59e0b;color:white;"
-        onclick="openReviewModal('${ticket._id}','${route._id || ""}')">
+${route._id ? `
+<button
+    class="btn"
+    style="background:#f59e0b;color:white;"
+    onclick="openReviewModal('${ticket._id}','${route._id}')">
 
-        ⭐ Leave Review
+    ⭐ Leave Review
 
-    </button>
-
+</button>
+` : ""}
 </div>
 
 </div>
