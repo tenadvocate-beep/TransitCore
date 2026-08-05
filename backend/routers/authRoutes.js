@@ -1,5 +1,6 @@
 const express = require("express");
 const router = express.Router();
+const sendEmail = require("../utils/email");
 
 const {
     registerUser,
@@ -24,4 +25,22 @@ router.post("/admin-login", adminLogin);
 
 
 
+router.get("/test-email", async (req, res) => {
+    try {
+
+        await sendEmail({
+            to: "olofin-samuel.oluwateniola@lmu.edu.ng",
+            subject: "TransitCore Test Email",
+            html: "<h2>🎉 TransitCore Email Test</h2><p>If you received this, email is working!</p>"
+        });
+
+        res.send("✅ Email sent successfully!");
+
+    } catch (err) {
+
+        console.error(err);
+        res.status(500).send(err.message);
+
+    }
+});
 module.exports = router;
