@@ -115,6 +115,10 @@ const getMyBookings = async (req, res) => {
         })
         .populate("route")
         .populate("user", "name email");
+bookings.forEach(b => {
+    console.log(b.bookingCode, b.route);
+});
+
 
         res.status(200).json({
             success: true,
