@@ -10,14 +10,27 @@ const transporter = nodemailer.createTransport({
 
 const sendEmail = async (options) => {
 
-    const mailOptions = {
-        from: `"TransitCore" <${process.env.EMAIL_USER}>`,
-        to: options.to,
-        subject: options.subject,
-        html: options.html
-    };
+    try {
 
-    await transporter.sendMail(mailOptions);
+        console.log("📧 Sending email to:", options.to);
+
+        const info = await transporter.sendMail({
+            from: `"TransitCore" <${process.env.EMAIL_USER}>`,
+            to: options.to,
+            subject: options.subject,
+            html: options.html
+        });
+
+        console.log("✅ Email sent:", info.messageId);
+
+    } catch (error) {
+
+        console.error("❌ Email error:");
+        console.error(error);
+
+        throw error;
+    }
+
 };
 
 module.exports = sendEmail;
