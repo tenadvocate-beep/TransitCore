@@ -327,13 +327,13 @@ try {
             `
         });
 
-        console.log("Booking email sent");
+        console.log("🔥 EMAIL SENT SUCCESSFULLY");
 
     }
 
 } catch (emailError) {
 
-    console.log("Email failed:", emailError.message);
+    console.log("🔥 EMAIL FAILED:", emailError);
 
 }
 
